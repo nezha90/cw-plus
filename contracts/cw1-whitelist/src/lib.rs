@@ -25,4 +25,7 @@ mod integration_tests;
 pub mod msg;
 pub mod state;
 
+pub mod resource_type;
+pub mod resource;
+
 pub use crate::error::ContractError;

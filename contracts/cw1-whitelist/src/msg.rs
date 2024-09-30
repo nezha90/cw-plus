@@ -5,6 +5,8 @@ use std::fmt;
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::{CosmosMsg, Empty};
 
+use crate::resource_type::{ResourceType,Resource};
+
 #[cw_serde]
 pub struct InstantiateMsg {
     pub admins: Vec<String>,
@@ -25,6 +27,21 @@ where
     /// UpdateAdmins will change the admin set of the contract, must be called by an existing admin,
     /// and only works if the contract is mutable
     UpdateAdmins { admins: Vec<String> },
+
+    ///B
+    //UseResources { ids: Vec<String>},
+
+    ///B
+    UpdateResources { ids: Vec<String>, resource_types: Vec<ResourceType>},
+
+    ///B
+    AddResources { resources: Vec<Resource>},
+
+    ///B
+    //ReleaseResources { ids: Vec<String>},
+
+    ///B
+    DeleteResources { ids: Vec<String>},
 }
 
 #[cw_serde]
@@ -41,6 +58,9 @@ where
     /// before any further state changes, should also succeed.
     #[returns(cw1::CanExecuteResponse)]
     CanExecute { sender: String, msg: CosmosMsg<T> },
+
+    #[returns(Vec<Resource>)]
+    QueryResources { ids: Vec<String>},
 }
 
 #[cw_serde]

@@ -14,6 +14,7 @@ use cw2::set_contract_version;
 use crate::error::ContractError;
 use crate::msg::{AdminListResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{AdminList, ADMIN_LIST};
+use crate::resource::{query_resources, update_resources, add_resources, delete_resources};
 
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:cw1-whitelist";
@@ -52,6 +53,11 @@ pub fn execute(
         ExecuteMsg::Execute { msgs } => execute_execute(deps, env, info, msgs),
         ExecuteMsg::Freeze {} => execute_freeze(deps, env, info),
         ExecuteMsg::UpdateAdmins { admins } => execute_update_admins(deps, env, info, admins),
+        //ExecuteMsg::UseResources { ids } => {}
+        ExecuteMsg::UpdateResources { ids, resource_types } => {update_resources(deps, env, info, ids, resource_types)}
+        ExecuteMsg::AddResources { resources } => {add_resources(deps, env, info, resources)}
+        //ExecuteMsg::ReleaseResources { ids } => {}
+        ExecuteMsg::DeleteResources { ids } => {delete_resources(deps, env, info, ids)}
     }
 }
 
@@ -121,6 +127,9 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
         QueryMsg::AdminList {} => to_json_binary(&query_admin_list(deps)?),
         QueryMsg::CanExecute { sender, msg } => {
             to_json_binary(&query_can_execute(deps, sender, msg)?)
+        }
+        QueryMsg::QueryResources {ids} => {
+            to_json_binary(&query_resources(deps, ids)?)
         }
     }
 }

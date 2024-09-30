@@ -31,5 +31,5 @@ thiserror = { workspace = true }
 [dev-dependencies]
 anyhow = "1"
 assert_matches = "1"
-cw-multi-test = { workspace = true }
 derivative = "2"
+cw-multi-test = { workspace = true }
