@@ -74,6 +74,11 @@ pub fn end_order(
     // 加载订单
     let mut order = ORDER_MAP.load(deps.storage, order_id.clone())?;
 
+    if order.status != OrderStatus::Active {
+        // 活跃订单才能正常终止
+        return  Err(ContractError::OtherError);
+    }
+
     // 检查订单是否已到期
     if env.block.height < order.end_height {
         return  Err(ContractError::OtherError);
