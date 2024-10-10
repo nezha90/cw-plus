@@ -26,7 +26,7 @@ pub fn create_order(
     }
 
     // 计算总费用
-    let total_cost = resource.get_resource_price * duration as u128;
+    let total_cost = resource.get_resource_price() * duration as u128;
 
     // 检查用户是否发送了足够的资金
     let sent_funds = info.funds.iter().find(|coin| coin.denom == DEFAULT_DENOM);

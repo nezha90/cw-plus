@@ -26,7 +26,7 @@ pub enum HandleAction {
     Terminate,        // 终止异常订单
 }
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug, Default)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug)]
 pub struct Order {
     pub id: String,              // 订单ID
     pub resource_id: String,     // 资源ID
