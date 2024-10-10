@@ -6,6 +6,7 @@ use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::{CosmosMsg, Empty};
 
 use crate::resource_type::{ResourceType,Resource};
+use crate::order_type::{HandleAction};
 
 #[cw_serde]
 pub struct InstantiateMsg {
@@ -42,6 +43,15 @@ where
 
     ///B
     DeleteResources { ids: Vec<String>},
+
+    /// B
+    CreateOrder{resource_id: String, duration: u64},
+
+    /// B
+    EndOrder{order_id: String},
+
+    /// B
+    HandleException{order_id: String, action: HandleAction},
 }
 
 #[cw_serde]

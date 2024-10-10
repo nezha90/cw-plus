@@ -15,6 +15,7 @@ use crate::error::ContractError;
 use crate::msg::{AdminListResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{AdminList, ADMIN_LIST};
 use crate::resource::{query_resources, update_resources, add_resources, delete_resources};
+use crate::order::{create_order, end_order, handle_exception};
 
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:cw1-whitelist";
@@ -58,6 +59,9 @@ pub fn execute(
         ExecuteMsg::AddResources { resources } => {add_resources(deps, env, info, resources)}
         //ExecuteMsg::ReleaseResources { ids } => {}
         ExecuteMsg::DeleteResources { ids } => {delete_resources(deps, env, info, ids)}
+        ExecuteMsg::CreateOrder { resource_id, duration } => {create_order(deps, env,info, resource_id, duration)}
+        ExecuteMsg::EndOrder { order_id } => {end_order(deps,env,info, order_id)}
+        ExecuteMsg::HandleException { order_id, action } => {handle_exception(deps,env, info, order_id, action)}
     }
 }
 

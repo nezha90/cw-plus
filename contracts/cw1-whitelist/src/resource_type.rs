@@ -156,6 +156,8 @@ impl ResourceAttr {
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug, Default)]
 pub enum Status {
     Unused,                  // 未使用
+
+    Used,                   //  正在使用
     //UsedRemaining,           // 已使用但还有空余
     Suspended,               // 暂停接单
 
@@ -182,6 +184,10 @@ impl Resource {
         self.id.clone()
     }
 
+    pub fn get_owner(&self) -> Addr {
+        self.owner.clone()
+    }
+
     pub fn get_resource_price(&self) -> u128 {
         let cpu_price = self.resources_attr.cpu.unit_price * self.resources_attr.cpu.total;
         let memory_price = self.resources_attr.memory.unit_price * self.resources_attr.memory.total;
@@ -196,6 +202,10 @@ impl Resource {
 
     pub fn get_status(&self) -> Status {
         self.status.clone()
+    }
+
+    pub fn check_status(&self, status: Status) -> bool {
+        self.status == status
     }
 
     pub fn set_status(&mut self, status: Status) {
