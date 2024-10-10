@@ -1,10 +1,10 @@
-use cosmwasm_std::{Deps, DepsMut, Env, MessageInfo, Response, StdResult, Coin, StdError, BankMsg};
+use cosmwasm_std::{DepsMut, Env, MessageInfo, Response, Coin, BankMsg};
 use cw_storage_plus::Map;
 
 use crate::ContractError;
-use crate::resource_type::{Resource, ResourceType, Status};
 use crate::state::{ADMIN_LIST};
 use crate::resource::{RESOURCE_MAP, update_status_by_RESOURCE_MAP};
+use crate::resource_type::{Status};
 use crate::order_type::{Order, OrderStatus, HandleAction, DEFAULT_DENOM};
 
 pub const ORDER_MAP: Map<String, Order> = Map::new("orders");

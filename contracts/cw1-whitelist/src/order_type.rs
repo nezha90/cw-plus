@@ -1,14 +1,6 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use cosmwasm_std::{Deps, DepsMut, Env, MessageInfo, Response, StdResult, Coin, StdError, BankMsg};
-use cw_storage_plus::Map;
-
-use crate::ContractError;
-use crate::resource_type::{Resource, ResourceType, Status};
-use crate::state::{ADMIN_LIST};
-use crate::resource::{RESOURCE_MAP, update_status_by_RESOURCE_MAP};
-
 use cosmwasm_std::Addr;
 
 pub const DEFAULT_DENOM: &str = "uttnt";
