@@ -11,7 +11,7 @@ pub fn update_status_by_RESOURCE_MAP(deps: DepsMut, id: String, status: Status) 
     RESOURCE_MAP.update(deps.storage, id, |resource: Option<Resource>|{
         let mut resource = resource.ok_or(ContractError::NotFound)?;
 
-        resource.set_status(status)?;
+        resource.set_status(status);
 
         Ok::<Resource, ContractError>(resource)
     })
