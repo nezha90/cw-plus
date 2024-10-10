@@ -5,7 +5,7 @@ use crate::ContractError;
 use crate::resource_type::{Resource, ResourceType, Status};
 use crate::state::{ADMIN_LIST};
 use crate::resource::{RESOURCE_MAP, update_status_by_RESOURCE_MAP};
-use crate::order_type::{Order, OrderStatus, HandleAction};
+use crate::order_type::{Order, OrderStatus, HandleAction, DEFAULT_DENOM};
 
 pub const ORDER_MAP: Map<String, Order> = Map::new("orders");
 

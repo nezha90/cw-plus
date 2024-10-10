@@ -11,7 +11,7 @@ use crate::resource::{RESOURCE_MAP, update_status_by_RESOURCE_MAP};
 
 use cosmwasm_std::Addr;
 
-const DEFAULT_DENOM: &str = "uttnt";
+pub const DEFAULT_DENOM: &str = "uttnt";
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug, Default)]
 pub enum OrderStatus {
