@@ -55,7 +55,7 @@ pub fn create_order(
     ORDER_MAP.save(deps.storage, order.id.clone(), &order)?;
 
     //更新资源状态
-    update_status_by_RESOURCE_MAP(resource.get_id(), Status::Used)?;
+    update_status_by_RESOURCE_MAP(deps, resource.get_id(), Status::Used)?;
 
     // 返回响应，确认订单创建成功
     Ok(Response::new()
@@ -96,7 +96,7 @@ pub fn end_order(
     ORDER_MAP.save(deps.storage, order_id.clone(), &order)?;
 
     // 更新资源状态为未使用
-    update_status_by_RESOURCE_MAP(resource.get_id(), Status::Unused)?;
+    update_status_by_RESOURCE_MAP(deps, resource.get_id(), Status::Unused)?;
 
     // 返回响应，并发送资金
     Ok(Response::new()
@@ -159,7 +159,7 @@ pub fn handle_exception(
                 ORDER_MAP.save(deps.storage, order_id.clone(), &order)?;
 
                 // 处理资源状态，设置为未使用
-                update_status_by_RESOURCE_MAP(order.resource_id.clone(),  Status::Unused)?;
+                update_status_by_RESOURCE_MAP(deps,order.resource_id.clone(),  Status::Unused)?;
 
                 // 处理资金，退还给订单发起者
                 let refund_msg = BankMsg::Send {
