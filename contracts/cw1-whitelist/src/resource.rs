@@ -7,7 +7,7 @@ use crate::state::{ADMIN_LIST};
 
 pub const RESOURCE_MAP: Map<String, Resource> = Map::new("resources");
 
-pub fn update_status_by_RESOURCE_MAP(deps: DepsMut, id: String, status: Status) -> Result<Resource, StdError> {
+pub fn update_status_by_RESOURCE_MAP(deps: DepsMut, id: String, status: Status) -> Result<Resource, ContractError> {
     RESOURCE_MAP.update(deps.storage, id, |resource: Option<Resource>|{
         let mut resource = resource.ok_or(ContractError::NotFound)?;
 
