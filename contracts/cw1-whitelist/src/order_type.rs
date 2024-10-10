@@ -1,3 +1,6 @@
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
+
 use cosmwasm_std::{Deps, DepsMut, Env, MessageInfo, Response, StdResult, Coin, StdError, BankMsg};
 use cw_storage_plus::Map;
 
