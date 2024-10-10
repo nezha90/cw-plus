@@ -7,6 +7,16 @@ use crate::state::{ADMIN_LIST};
 
 pub const RESOURCE_MAP: Map<String, Resource> = Map::new("resources");
 
+pub fn update_status_by_resource_map(deps: DepsMut, id: String, status: Status) -> Result<Resource, ContractError> {
+    RESOURCE_MAP.update(deps.storage, id, |resource: Option<Resource>|{
+        let mut resource = resource.ok_or(ContractError::NotFound)?;
+
+        resource.set_status(status);
+
+        Ok::<Resource, ContractError>(resource)
+    })
+}
+
 pub fn query_resources(deps: Deps, ids: Vec<String>) -> StdResult<Vec<Resource>> {
     let mut resources = Vec::new();
 

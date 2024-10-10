@@ -27,5 +27,7 @@ pub mod state;
 
 pub mod resource_type;
 pub mod resource;
+pub mod order_type;
+pub mod order;
 
 pub use crate::error::ContractError;
