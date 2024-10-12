@@ -1,4 +1,4 @@
-use cosmwasm_std::{Deps, DepsMut, Env, MessageInfo, Response, StdResult};
+use cosmwasm_std::{DepsMut, Env, MessageInfo, Response};
 use cw_storage_plus::Map;
 
 use crate::ContractError;

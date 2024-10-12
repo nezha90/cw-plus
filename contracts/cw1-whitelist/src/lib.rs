@@ -26,9 +26,9 @@ pub mod msg;
 pub mod state;
 
 pub mod resource_type;
-pub mod resource;
+pub mod tx_resource;
 pub mod order_type;
-pub mod order;
+pub mod tx_order;
 pub mod query_resource;
 pub mod query_order;
 
