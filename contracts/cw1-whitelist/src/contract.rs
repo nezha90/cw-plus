@@ -14,7 +14,8 @@ use cw2::set_contract_version;
 use crate::error::ContractError;
 use crate::msg::{AdminListResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{AdminList, ADMIN_LIST};
-use crate::resource::{query_resources, update_resources, add_resources, delete_resources};
+use crate::resource::{update_resources, add_resources, delete_resources};
+use crate::query_resource::{query_resources};
 use crate::order::{create_order, end_order, handle_exception};
 
 // version info for migration info
