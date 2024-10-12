@@ -29,5 +29,7 @@ pub mod resource_type;
 pub mod resource;
 pub mod order_type;
 pub mod order;
+pub mod query_resource;
+pub mod query_order;
 
 pub use crate::error::ContractError;

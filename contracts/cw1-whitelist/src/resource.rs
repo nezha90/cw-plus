@@ -17,19 +17,6 @@ pub fn update_status_by_resource_map(deps: DepsMut, id: String, status: Status) 
     })
 }
 
-pub fn query_resources(deps: Deps, ids: Vec<String>) -> StdResult<Vec<Resource>> {
-    let mut resources = Vec::new();
-
-    for id in ids {
-        if let Some(resource) = RESOURCE_MAP.may_load(deps.storage, id)? {
-            resources.push(resource);
-        }
-    }
-
-    Ok(resources)
-}
-
-
 // 使用一组资源
 pub fn use_resources(
     deps: DepsMut,
