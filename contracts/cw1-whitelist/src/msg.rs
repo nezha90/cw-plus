@@ -5,8 +5,8 @@ use std::fmt;
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::{CosmosMsg, Empty};
 
-use crate::resource_type::{ResourceType,Resource};
-use crate::order_type::{HandleAction};
+use crate::type_resource::{ResourceType, Resource};
+use crate::type_order::{HandleAction};
 
 #[cw_serde]
 pub struct InstantiateMsg {

@@ -2,7 +2,7 @@ use cosmwasm_std::{DepsMut, Env, MessageInfo, Response};
 use cw_storage_plus::Map;
 
 use crate::ContractError;
-use crate::resource_type::{Resource, ResourceType, Status};
+use crate::type_resource::{Resource, ResourceType, Status};
 use crate::state::{ADMIN_LIST};
 
 pub const RESOURCE_MAP: Map<String, Resource> = Map::new("resources");

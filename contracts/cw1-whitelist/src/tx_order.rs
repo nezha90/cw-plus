@@ -4,8 +4,8 @@ use cw_storage_plus::Map;
 use crate::ContractError;
 use crate::state::{ADMIN_LIST};
 use crate::tx_resource::{RESOURCE_MAP, update_status_by_resource_map};
-use crate::resource_type::{Status};
-use crate::order_type::{Order, OrderStatus, HandleAction, DEFAULT_DENOM};
+use crate::type_resource::{Status};
+use crate::type_order::{Order, OrderStatus, HandleAction, DEFAULT_DENOM};
 
 pub const ORDER_MAP: Map<String, Order> = Map::new("orders");
 
