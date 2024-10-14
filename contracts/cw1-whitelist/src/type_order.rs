@@ -36,8 +36,3 @@ pub struct Order {
     pub locked_funds: u128,      // 锁定的资金
     pub status: OrderStatus,     // 订单状态
 }
-
-
-
-
-
