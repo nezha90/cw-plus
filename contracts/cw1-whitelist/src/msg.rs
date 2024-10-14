@@ -72,7 +72,7 @@ where
     #[returns(Vec<Resource>)]
     QueryResources { ids: Vec<String>},
 
-    #[return(Vec<Order>)]
+    #[returns(Vec<Order>)]
     QueryOrders { ids: Vec<String>},
 }
 
