@@ -16,6 +16,7 @@ use crate::msg::{AdminListResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{AdminList, ADMIN_LIST};
 use crate::tx_resource::{update_resources, add_resources, delete_resources};
 use crate::query_resource::{query_resources};
+use crate::query_order::{query_orders};
 use crate::tx_order::{create_order, end_order, handle_exception};
 
 // version info for migration info
@@ -135,6 +136,9 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
         }
         QueryMsg::QueryResources {ids} => {
             to_json_binary(&query_resources(deps, ids)?)
+        }
+        QueryMsg::QueryOrders {ids} => {
+            to_json_binary(&query_orders(deps, ids)?)
         }
     }
 }
