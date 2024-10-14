@@ -1,7 +1,6 @@
 use cosmwasm_std::{Deps, StdResult};
 
 use crate::type_order::{Order};
-use crate::type_resource::{Resource};
 use crate::tx_order::ORDER_MAP;
 
 pub fn query_orders(deps: Deps, ids: Vec<String>) -> StdResult<Vec<Order>> {
