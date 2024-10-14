@@ -6,7 +6,7 @@ use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::{CosmosMsg, Empty};
 
 use crate::type_resource::{ResourceType, Resource};
-use crate::type_order::{HandleAction};
+use crate::type_order::{HandleAction, Order};
 
 #[cw_serde]
 pub struct InstantiateMsg {
