@@ -24,7 +24,7 @@ pub fn create_batch_orders(
     let mut total_cost = 0;
     let mut order_ids = Vec::<String>::new();
 
-    resource_ids.iter().enumerate().map(|(index, resource_id)| {
+    resource_ids.iter().enumerate().try_for_each(|(index, resource_id)| {
         // 加载资源
         let resource = RESOURCE_MAP.load(deps.storage, resource_id.clone())?;
 
@@ -100,7 +100,7 @@ pub fn end_orders_by_batch_id(
     }
     let mut payment_msgs = Vec::new();
 
-    batch_order.order_ids.iter().enumerate().map(|(index, order_id)|{
+    batch_order.order_ids.iter().enumerate().try_for_each(|(index, order_id)|{
         // 加载订单
         let mut order = ORDER_MAP.load(deps.storage, order_id.clone())?;
 
