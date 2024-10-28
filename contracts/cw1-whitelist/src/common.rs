@@ -8,7 +8,7 @@ pub fn create_order_id(env: Env, index: usize) -> String {
 
     // 将区块高度和发送者地址作为输入进行哈希
     hasher.update(env.block.height.to_be_bytes());
-    hasher.update(env.transaction.index);
+    hasher.update(env.transaction.unwrap().index);
     hasher.update(index.into());
 
     let result = hasher.finalize();
@@ -38,7 +38,7 @@ pub fn create_batch_order_id(env: Env) -> String {
 
     // 将区块高度和发送者地址作为输入进行哈希
     hasher.update(env.block.height.to_be_bytes());
-    hasher.update(env.transaction.index);
+    hasher.update(env.transaction.unwrap().index);
 
     let result = hasher.finalize();
 
