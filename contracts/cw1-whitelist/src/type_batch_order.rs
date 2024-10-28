@@ -1,15 +1,7 @@
-use cosmwasm_std::{Addr, Coin, DepsMut, Env, MessageInfo, Response, BankMsg};
-use crate::tx_resource::{RESOURCE_MAP, update_status_by_resource_map};
-use crate::type_resource::Status;
-use crate::ContractError;
-use crate::type_order::{DEFAULT_DENOM, Order, OrderStatus};
-use crate::common::{check_deposit, create_order_id, create_batch_order_id};
-use crate::tx_order::ORDER_MAP;
-use cw_storage_plus::Map;
-use std::borrow::BorrowMut;
-use std::io::SeekFrom::Start;
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
 
-pub const BATCH_ORDER_MAP: Map<String, BatchOrder> = Map::new("batch_order");
+use cosmwasm_std::Addr;
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug)]
 pub struct BatchOrder {
