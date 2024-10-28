@@ -11,7 +11,7 @@ use std::io::SeekFrom::Start;
 
 pub const BATCH_ORDER_MAP: Map<String, BatchOrder> = Map::new("batch_order");
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug, Default)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug)]
 pub struct BatchOrder {
     pub batch_id: String,         // 批量订单ID
     pub order_ids: Vec<String>,   // 关联订单的ID列表
