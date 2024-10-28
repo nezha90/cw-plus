@@ -1,4 +1,4 @@
-use std::borrow::{BorrowMut, Borrow};
+use std::borrow::{BorrowMut};
 
 use cw_storage_plus::Map;
 use cosmwasm_std::{Coin, DepsMut, Env, MessageInfo, Response, BankMsg};
