@@ -93,7 +93,7 @@ pub fn end_orders_by_batch_id(
     _info: MessageInfo,
     batch_id: String,
 ) -> Result<Response,ContractError> {
-    let mut batch_order = BATCH_ORDER_MAP.load(deps.storage, batch_id.clone())?;
+    let batch_order = BATCH_ORDER_MAP.load(deps.storage, batch_id.clone())?;
 
     // 检查订单是否已到期
     if env.block.height < batch_order.end_height {
@@ -102,7 +102,7 @@ pub fn end_orders_by_batch_id(
     }
     let mut payment_msgs = Vec::new();
 
-    batch_order.order_ids.iter().enumerate().try_for_each(|(index, order_id)|{
+    batch_order.order_ids.iter().try_for_each(|order_id|{
         // 加载订单
         let mut order = ORDER_MAP.load(deps.storage, order_id.clone())?;
 
