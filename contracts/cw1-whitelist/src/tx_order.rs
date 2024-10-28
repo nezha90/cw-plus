@@ -6,7 +6,6 @@ use crate::state::{ADMIN_LIST};
 use crate::tx_resource::{RESOURCE_MAP, update_status_by_resource_map};
 use crate::type_resource::{Status};
 use crate::type_order::{Order, OrderStatus, HandleAction, DEFAULT_DENOM};
-use crate::type_batch_order::create_order_inner;
 use crate::common::{create_order_id, check_deposit};
 
 pub const ORDER_MAP: Map<String, Order> = Map::new("orders");
