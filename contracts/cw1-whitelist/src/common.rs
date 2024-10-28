@@ -9,7 +9,7 @@ pub fn create_order_id(env: Env, index: usize) -> String {
     // 将区块高度和发送者地址作为输入进行哈希
     hasher.update(env.block.height.to_be_bytes());
     hasher.update(env.transaction.unwrap().index.to_be_bytes());
-    hasher.update(index.into());
+    hasher.update(index.to_be_bytes());
 
     let result = hasher.finalize();
 
