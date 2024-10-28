@@ -24,5 +24,6 @@ pub mod error;
 mod integration_tests;
 pub mod msg;
 pub mod state;
+pub mod type_order;
 
 pub use crate::error::ContractError;
