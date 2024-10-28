@@ -3,7 +3,7 @@ use cosmwasm_std::{Env, MessageInfo, Coin};
 use crate::ContractError;
 use crate::type_order::DEFAULT_DENOM;
 
-pub fn create_order_id(_env: Env, index: usize) -> String {
+pub fn create_order_id(env: Env, index: usize) -> String {
     let mut hasher = Sha256::new();
 
     // 将区块高度和发送者地址作为输入进行哈希
@@ -16,7 +16,7 @@ pub fn create_order_id(_env: Env, index: usize) -> String {
     result.to_string()
 }
 
-pub fn check_deposit( info: MessageInfo, total_cost: u128) -> Result<(), ContractError> {
+pub fn check_deposit(info: MessageInfo, total_cost: u128) -> Result<(), ContractError> {
     let sent_funds = info.funds.iter().find(|coin| coin.denom == DEFAULT_DENOM);
 
     return if let Some(Coin { amount, .. }) = sent_funds {
@@ -33,7 +33,7 @@ pub fn check_deposit( info: MessageInfo, total_cost: u128) -> Result<(), Contrac
 }
 
 
-pub fn create_batch_order_id(_env: Env) -> String {
+pub fn create_batch_order_id(env: Env) -> String {
     let mut hasher = Sha256::new();
 
     // 将区块高度和发送者地址作为输入进行哈希

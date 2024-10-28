@@ -9,7 +9,6 @@ use cw_storage_plus::Map;
 use std::borrow::BorrowMut;
 use std::io::SeekFrom::Start;
 
-
 pub const BATCH_ORDER_MAP: Map<String, BatchOrder> = Map::new("batch_order");
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug, Default)]
