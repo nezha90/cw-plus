@@ -24,6 +24,8 @@ pub fn create_batch_orders(
     let mut total_cost = 0;
     let mut order_ids = Vec::<String>::new();
 
+    let initiator = info.sender.clone();
+
     resource_ids.iter().enumerate().try_for_each(|(index, resource_id)| {
         // 加载资源
         let resource = RESOURCE_MAP.load(deps.storage, resource_id.clone())?;
@@ -41,11 +43,11 @@ pub fn create_batch_orders(
 
         let order_id = create_order_id(env.clone(), index);
         // 创建订单
-        let mut order = Order::new(
+        let order = Order::new(
             env.block.height,
             env.block.height + duration,
             cost,
-            info.sender.clone(),
+            initiator.clone(),
             resource_id.clone(),
             order_id.clone(),
         );
@@ -68,7 +70,7 @@ pub fn create_batch_orders(
     let batch_order = BatchOrder::new(
         batch_id.clone(),
         order_ids,
-        info.sender.clone(),
+        initiator.clone(),
         total_cost,
         env.block.height,
         env.block.height+duration,
