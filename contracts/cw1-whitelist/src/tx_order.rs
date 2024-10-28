@@ -37,6 +37,8 @@ pub fn create_order(
     // 计算总费用
     let total_cost = resource.get_resource_price() * duration as u128;
 
+    let initiator = info.sender.clone();
+
     // 检查用户是否发送了足够的资金
     check_deposit(info, total_cost)?;
 
@@ -49,7 +51,7 @@ pub fn create_order(
 
         resource_id: resource_id.clone(),
 
-        initiator: info.sender.clone(),
+        initiator,
         locked_funds: total_cost,
         status: OrderStatus::Active,
     };
