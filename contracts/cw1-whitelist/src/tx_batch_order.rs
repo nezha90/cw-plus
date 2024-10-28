@@ -8,7 +8,9 @@ use crate::tx_order::ORDER_MAP;
 use cw_storage_plus::Map;
 use std::borrow::BorrowMut;
 use std::io::SeekFrom::Start;
-use crate::type_batch_order::{BatchOrder, BATCH_ORDER_MAP};
+use crate::type_batch_order::{BatchOrder};
+
+pub const BATCH_ORDER_MAP: Map<String, BatchOrder> = Map::new("batch_order");
 
 
 pub fn create_batch_orders(
