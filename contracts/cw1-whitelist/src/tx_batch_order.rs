@@ -1,4 +1,4 @@
-use std::borrow::BorrowMut;
+use std::borrow::{BorrowMut, Borrow};
 
 use cw_storage_plus::Map;
 use cosmwasm_std::{Coin, DepsMut, Env, MessageInfo, Response, BankMsg};
@@ -58,7 +58,7 @@ pub fn create_batch_orders(
         ORDER_MAP.save(deps.storage.borrow_mut(), order.id.clone(), &order)?;
 
         //更新资源状态
-        update_status_by_resource_map(deps, resource.get_id(), Status::Used)?;
+        update_status_by_resource_map(deps.storage.borrow_mut(), resource.get_id(), Status::Used)?;
 
         Ok(())
     })?;
@@ -112,9 +112,9 @@ pub fn end_orders_by_batch_id(
 
             ORDER_MAP.save(deps.storage, order_id.clone(), &order)?;
 
-            let resource = RESOURCE_MAP.load(deps.storage, order.resource_id.clone())?;
+            let resource = RESOURCE_MAP.load(deps.storage.borrow_mut(), order.resource_id.clone())?;
             // 更新资源状态为未使用
-            update_status_by_resource_map(deps, resource.get_id(), Status::Unused)?;
+            update_status_by_resource_map(deps.storage.borrow_mut(), resource.get_id(), Status::Unused)?;
 
             payment_msgs.push(BankMsg::Send {
                 to_address: resource.get_owner().to_string(),

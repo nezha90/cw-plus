@@ -1,4 +1,4 @@
-use cosmwasm_std::{DepsMut, Env, MessageInfo, Response};
+use cosmwasm_std::{DepsMut, Env, MessageInfo, Response, Storage};
 use cw_storage_plus::Map;
 
 use crate::ContractError;
@@ -7,8 +7,8 @@ use crate::state::{ADMIN_LIST};
 
 pub const RESOURCE_MAP: Map<String, Resource> = Map::new("resources");
 
-pub fn update_status_by_resource_map(deps: DepsMut, id: String, status: Status) -> Result<Resource, ContractError> {
-    RESOURCE_MAP.update(deps.storage, id, |resource: Option<Resource>|{
+pub fn update_status_by_resource_map(storage: &mut dyn Storage, id: String, status: Status) -> Result<Resource, ContractError> {
+    RESOURCE_MAP.update(storage, id, |resource: Option<Resource>|{
         let mut resource = resource.ok_or(ContractError::NotFound)?;
 
         resource.set_status(status);
