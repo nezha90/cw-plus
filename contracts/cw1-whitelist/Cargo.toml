@@ -27,6 +27,7 @@ cw-storage-plus = { workspace = true }
 schemars = { workspace = true }
 serde = { workspace = true }
 thiserror = { workspace = true }
+sha2 = "0.10"
 
 [dev-dependencies]
 anyhow = "1"

@@ -6,8 +6,12 @@ use crate::state::{ADMIN_LIST};
 use crate::tx_resource::{RESOURCE_MAP, update_status_by_resource_map};
 use crate::type_resource::{Status};
 use crate::type_order::{Order, OrderStatus, HandleAction, DEFAULT_DENOM};
+use crate::type_batch_order::create_order_inner;
+use crate::common::{create_order_id, check_deposit};
 
 pub const ORDER_MAP: Map<String, Order> = Map::new("orders");
+
+pub const ORDER_MIN_DURATION: u64 = 600;
 
 pub fn create_order(
     deps: DepsMut,
@@ -16,6 +20,12 @@ pub fn create_order(
     resource_id: String,
     duration: u64,
 ) -> Result<Response,ContractError> {
+    // 资源最少使用权限
+    if duration < ORDER_MIN_DURATION {
+        return Err(ContractError::OtherError);
+        //return Err(StdError::generic_err("Resource is not available"));
+    }
+
     // 加载资源
     let resource = RESOURCE_MAP.load(deps.storage, resource_id.clone())?;
 
@@ -29,24 +39,18 @@ pub fn create_order(
     let total_cost = resource.get_resource_price() * duration as u128;
 
     // 检查用户是否发送了足够的资金
-    let sent_funds = info.funds.iter().find(|coin| coin.denom == DEFAULT_DENOM);
-    if let Some(Coin { amount, .. }) = sent_funds {
-        if *amount < total_cost.into() {
-            return Err(ContractError::OtherError);
-            //return Err(StdError::generic_err("Insufficient funds sent"));
-        }
-    } else {
-        return Err(ContractError::OtherError);
-        //return Err(StdError::generic_err("No funds sent"));
-    }
+    check_deposit(info, total_cost)?;
 
     // 创建订单
-    let order = Order {
-        id: env.block.height.to_string(),
-        resource_id: resource_id.clone(),
-        initiator: info.sender.clone(),
+    let mut order = Order {
         start_height: env.block.height,
         end_height: env.block.height + duration,
+
+        id: create_order_id(env, 0),
+
+        resource_id: resource_id.clone(),
+
+        initiator: info.sender.clone(),
         locked_funds: total_cost,
         status: OrderStatus::Active,
     };
@@ -101,7 +105,7 @@ pub fn end_order(
     ORDER_MAP.save(deps.storage, order_id.clone(), &order)?;
 
     // 更新资源状态为未使用
-    update_status_by_resource_map(deps, resource.get_id(), Status::Unused)?;
+    update_status_by_resource_map(deps, resource.get_id(), Status::Unused)?;··· ··
 
     // 返回响应，并发送资金
     Ok(Response::new()

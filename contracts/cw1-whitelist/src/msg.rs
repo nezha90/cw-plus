@@ -52,6 +52,13 @@ where
 
     /// B
     HandleException{order_id: String, action: HandleAction},
+
+    ///B
+    CreateOrders { resource_ids: Vec<String>, duration: u64},
+
+    ///B
+    EndOrders { batch_id: String},
+
 }
 
 #[cw_serde]

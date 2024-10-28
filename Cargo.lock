@@ -318,6 +318,7 @@ dependencies = [
  "derivative",
  "schemars",
  "serde",
+ "sha2 0.10.8",
  "thiserror",
 ]
 

@@ -18,6 +18,7 @@ use crate::tx_resource::{update_resources, add_resources, delete_resources};
 use crate::query_resource::{query_resources};
 use crate::query_order::{query_orders};
 use crate::tx_order::{create_order, end_order, handle_exception};
+use crate::type_batch_order::{create_batch_orders, end_orders_by_batch_id};
 
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:cw1-whitelist";
@@ -64,6 +65,8 @@ pub fn execute(
         ExecuteMsg::CreateOrder { resource_id, duration } => {create_order(deps, env,info, resource_id, duration)}
         ExecuteMsg::EndOrder { order_id } => {end_order(deps,env,info, order_id)}
         ExecuteMsg::HandleException { order_id, action } => {handle_exception(deps,env, info, order_id, action)}
+        ExecuteMsg::CreateOrders {resource_ids, duration} => {create_batch_orders(deps, env, info, resource_ids, duration)}
+        ExecuteMsg::EndOrders {batch_id} => {end_orders_by_batch_id(deps, env, info, batch_id)}
     }
 }
 

@@ -31,5 +31,7 @@ pub mod type_order;
 pub mod tx_order;
 pub mod query_resource;
 pub mod query_order;
+pub mod type_batch_order;
+pub mod common;
 
 pub use crate::error::ContractError;

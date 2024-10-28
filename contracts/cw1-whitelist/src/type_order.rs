@@ -36,3 +36,17 @@ pub struct Order {
     pub locked_funds: u128,      // 锁定的资金
     pub status: OrderStatus,     // 订单状态
 }
+
+impl Order {
+    pub fn new(start_height: u64, end_height: u64, locked_funds: u128, initiator: Addr, resource_id: String, id: String) -> Self {
+        Order{
+            id,
+            resource_id,
+            initiator,
+            start_height,
+            end_height,
+            locked_funds,
+            status: OrderStatus::Active,
+        }
+    }
+}
