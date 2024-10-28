@@ -43,7 +43,7 @@ pub fn create_order(
     check_deposit(info, total_cost)?;
 
     // 创建订单
-    let mut order = Order {
+    let order = Order {
         start_height: env.block.height,
         end_height: env.block.height + duration,
 

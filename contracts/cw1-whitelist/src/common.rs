@@ -1,6 +1,5 @@
 use sha2::{Digest, Sha256};
 use cosmwasm_std::{Env, MessageInfo, Coin};
-use sha2::digest::Update;
 use crate::ContractError;
 use crate::type_order::DEFAULT_DENOM;
 
