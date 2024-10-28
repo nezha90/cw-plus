@@ -119,7 +119,7 @@ pub fn end_orders_by_batch_id(
         return  Err(ContractError::OtherError);
         //return Err(StdError::generic_err("Order has not yet expired"));
     }
-    let mut payment_msgs = Vec::<BankMsg::Send>::new();
+    let mut payment_msgs = Vec::new();
 
     batch_order.order_ids.iter().enumerate().map(|(index, order_id)|{
         // 加载订单
