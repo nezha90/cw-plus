@@ -54,6 +54,10 @@ pub fn execute_receive(
                 }
 
                 order.locked_funds = locked_funds;
+
+                if duration < order.duration {
+                    return Err(ContractError::BadRequest);
+                }
                 order.duration = duration;
 
                 Ok::<Order, ContractError>(order)

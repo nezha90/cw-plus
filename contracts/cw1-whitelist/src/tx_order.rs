@@ -1,4 +1,4 @@
-use cosmwasm_std::{Binary, DepsMut, Env, MessageInfo, Response, Uint128, to_json_binary};
+use cosmwasm_std::{DepsMut, Env, MessageInfo, Response, Uint128, to_json_binary};
 
 use crate::common::{send, transfer, money_action, MoneyAction};
 use crate::consts::{ORDER_MAP, ORDER_MIN_DURATION};
