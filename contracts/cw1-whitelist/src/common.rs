@@ -1,7 +1,7 @@
-use cosmwasm_std::{Env, Uint128, Binary, StdResult, wasm_execute, WasmMsg, Storage, DepsMut};
+use cosmwasm_std::{Env, Uint128, Binary, StdResult, wasm_execute, WasmMsg, Storage};
 use cw20_base::msg::ExecuteMsg;
 use sha2::{Digest, Sha256};
-use std::fmt::Error;
+
 use crate::ContractError;
 use crate::consts::{LOCKED, EARNINGS};
 

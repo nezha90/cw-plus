@@ -2,10 +2,10 @@ use cosmwasm_std::{Binary, DepsMut, Env, from_json, MessageInfo, Response, Uint1
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::consts::{ORDER_MAP, LOCKED};
+use crate::consts::{ORDER_MAP};
 use crate::ContractError;
 use crate::type_order::{Order};
-use crate::common::{send, money_action, MoneyAction};
+use crate::common::{money_action, MoneyAction};
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug)]
 pub enum ReceiveMsg {
