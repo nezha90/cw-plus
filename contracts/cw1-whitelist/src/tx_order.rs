@@ -6,6 +6,7 @@ use crate::ContractError;
 use crate::type_order::{Order, Resource};
 use crate::state::ADMIN_LIST;
 
+// 创建订单
 pub fn execute_create_order(
     deps: DepsMut,
     env: Env,
@@ -64,17 +65,25 @@ pub fn execute_create_order(
     )
 }
 
+// 结束订单
 pub fn execute_release_order(
     deps: DepsMut,
     env: Env,
-    _info: MessageInfo,
+    info: MessageInfo,
     order_id: String,
 ) -> Result<Response, ContractError> {
+    // 加载管理员列表
+    let admin_list = ADMIN_LIST.load(deps.storage)?;
+
     // 加载订单
     let mut order = ORDER_MAP.load(deps.storage, order_id.clone())?;
 
-    // 得到总金额
+    // 仅管理员和使用者可以结束订单
+    if !admin_list.is_admin(info.sender.as_str()) && !order.is_initiator(info.sender){
+        return Err(ContractError::Unauthorized {});
+    }
 
+    // 得到总金额
     let locked_funds = order.locked_funds;
 
     // 计算实际消费并修改订单状态
@@ -107,7 +116,7 @@ pub fn execute_release_order(
     )
 }
 
-//
+// 管理员提币到指定地址
 pub fn execute_withdraw(
     deps: DepsMut,
     env: Env,
