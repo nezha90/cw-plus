@@ -4,6 +4,7 @@ use crate::common::{send, transfer, money_action, MoneyAction};
 use crate::consts::{ORDER_MAP, ORDER_MIN_DURATION};
 use crate::ContractError;
 use crate::type_order::{Order, Resource};
+use crate::state::ADMIN_LIST;
 
 pub fn execute_create_order(
     deps: DepsMut,
@@ -93,7 +94,7 @@ pub fn execute_release_order(
 
     // 构建退还余额消息
     let wasm_msg = transfer(
-        env.contract.address.to_string(),
+        "".to_string(),
         order.initiator.to_string(),
         Uint128::from(overage))?;
 
@@ -103,5 +104,34 @@ pub fn execute_release_order(
         .add_attribute("order_id", order_id)
         .add_attribute("cost", Uint128::from(price))
         .add_attribute("overage", Uint128::from(overage))
+    )
+}
+
+pub fn execute_withdraw(
+    deps: DepsMut,
+    env: Env,
+    _info: MessageInfo,
+    beneficiary: String,
+    amount: Uint128,
+) -> Result<Response, ContractError> {
+    // 仅管理员可提币
+    let admin_list = ADMIN_LIST.load(deps.storage)?;
+    if !admin_list.is_admin(info.sender.as_str()) {
+        return Err(ContractError::Unauthorized {});
+    }
+
+    // 减少资源提供者可提币数量
+    money_action(deps.storage, MoneyAction::DelEarnings, amount)?;
+
+    // 构建退还余额消息
+    let wasm_msg = transfer(
+        env.contract.address.to_string(),
+        beneficiary,
+        Uint128::from(amount))?;
+
+    Ok(Response::new()
+        .add_message(wasm_msg)
+        .add_attribute("action", "withdraw")
+        .add_attribute("amount", amount)
     )
 }
