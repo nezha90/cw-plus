@@ -80,7 +80,7 @@ impl Order {
     }
 
     pub fn calc_price(resource: &Resource, duration: u64) -> u128 {
-        Order::calc_unit_price(resource) * duration
+        Order::calc_unit_price(resource) * u128::from(duration)
     }
 
     pub fn renew(&mut self, funds: u128, duration: u64) -> Result<(), ContractError> {

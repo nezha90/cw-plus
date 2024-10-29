@@ -25,7 +25,7 @@ pub fn execute_create_order(
     }
 
     // 计算总费用
-    let total_cost = Order::calc_price(resource.clone(), duration);
+    let total_cost = Order::calc_price(&resource, duration);
 
     // 订单所有者
     let initiator = info.sender.clone();
@@ -50,7 +50,7 @@ pub fn execute_create_order(
     let wasm_msg = send(
         "".to_string(),
         env.contract.address.to_string(),
-        Uint128(total_cost),
+        Uint128::from(total_cost),
         Binary::new(Vec::new()),
     )?;
 
@@ -91,7 +91,7 @@ pub fn execute_release_order(
         .add_message(wasm_msg)
         .add_attribute("action", "end_order")
         .add_attribute("order_id", order_id)
-        .add_attribute("cost", price)
-        .add_attribute("overage", overage)
+        .add_attribute("cost", Uint128::from(price))
+        .add_attribute("overage", Uint128::from(overage))
     )
 }
