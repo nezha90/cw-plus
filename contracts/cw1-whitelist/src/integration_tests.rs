@@ -1,14 +1,16 @@
-use crate::msg::{AdminListResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
 use anyhow::{anyhow, Result};
 use assert_matches::assert_matches;
 use cosmwasm_std::{
-    testing::mock_dependencies, to_json_binary, Addr, CosmosMsg, Empty, QueryRequest, StdError,
+    Addr, CosmosMsg, Empty, QueryRequest, StdError, testing::mock_dependencies, to_json_binary,
     WasmMsg, WasmQuery,
 };
-use cw1::Cw1Contract;
 use cw_multi_test::{App, AppResponse, Contract, ContractWrapper, Executor};
 use derivative::Derivative;
 use serde::{de::DeserializeOwned, Serialize};
+
+use cw1::Cw1Contract;
+
+use crate::msg::{AdminListResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
 
 fn mock_app() -> App {
     App::default()
@@ -65,8 +67,8 @@ impl Suite {
         target_contract: &Addr,
         msg: M,
     ) -> Result<AppResponse>
-    where
-        M: Serialize + DeserializeOwned,
+        where
+            M: Serialize + DeserializeOwned,
     {
         let execute: ExecuteMsg = ExecuteMsg::Execute {
             msgs: vec![CosmosMsg::Wasm(WasmMsg::Execute {
@@ -86,8 +88,8 @@ impl Suite {
     }
 
     pub fn query<M>(&self, target_contract: Addr, msg: M) -> Result<AdminListResponse, StdError>
-    where
-        M: Serialize + DeserializeOwned,
+        where
+            M: Serialize + DeserializeOwned,
     {
         self.app.wrap().query(&QueryRequest::Wasm(WasmQuery::Smart {
             contract_addr: target_contract.to_string(),

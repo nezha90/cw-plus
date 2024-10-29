@@ -1,9 +1,10 @@
-use schemars::JsonSchema;
-
 use std::fmt;
 
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::{CosmosMsg, Empty};
+use cosmwasm_std::{Binary, CosmosMsg, Empty, Uint128};
+use schemars::JsonSchema;
+
+use crate::type_order::Resource;
 
 #[cw_serde]
 pub struct InstantiateMsg {
@@ -13,8 +14,8 @@ pub struct InstantiateMsg {
 
 #[cw_serde]
 pub enum ExecuteMsg<T = Empty>
-where
-    T: Clone + fmt::Debug + PartialEq + JsonSchema,
+    where
+        T: Clone + fmt::Debug + PartialEq + JsonSchema,
 {
     /// Execute requests the contract to re-dispatch all these messages with the
     /// contract's address as sender. Every implementation has it's own logic to
@@ -25,13 +26,22 @@ where
     /// UpdateAdmins will change the admin set of the contract, must be called by an existing admin,
     /// and only works if the contract is mutable
     UpdateAdmins { admins: Vec<String> },
+
+    /// cw20
+    Receive { sender: String, amount: Uint128, msg: Binary },
+
+    ///Create Order
+    CreateOrder { order_id: String, resource: Resource, duration: u64 },
+
+    //Release Order
+    ReleaseOrder { order_id: String },
 }
 
 #[cw_serde]
 #[derive(QueryResponses)]
 pub enum QueryMsg<T = Empty>
-where
-    T: Clone + fmt::Debug + PartialEq + JsonSchema,
+    where
+        T: Clone + fmt::Debug + PartialEq + JsonSchema,
 {
     /// Shows all admins and whether or not it is mutable
     #[returns(AdminListResponse)]

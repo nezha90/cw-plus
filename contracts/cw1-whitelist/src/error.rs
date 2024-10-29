@@ -13,5 +13,11 @@ pub enum ContractError {
     InsufficientFunds,
 
     #[error("Bad request")]
-    BadRequest
+    BadRequest,
+
+    #[error("Already exists")]
+    AlreadyExists,
+
+    #[error("Not Found")]
+    NotFound,
 }

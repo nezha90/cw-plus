@@ -1,19 +1,22 @@
-use schemars::JsonSchema;
 use std::fmt;
 
+use cosmwasm_std::{
+    Addr, Api, Binary, CosmosMsg, Deps, DepsMut, Empty, Env, MessageInfo, Response, StdResult,
+    to_json_binary,
+};
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cosmwasm_std::{
-    to_json_binary, Addr, Api, Binary, CosmosMsg, Deps, DepsMut, Empty, Env, MessageInfo, Response,
-    StdResult,
-};
+use cw20_base::contract;
+use cw2::set_contract_version;
+use schemars::JsonSchema;
 
 use cw1::CanExecuteResponse;
-use cw2::set_contract_version;
 
 use crate::error::ContractError;
 use crate::msg::{AdminListResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
-use crate::state::{AdminList, ADMIN_LIST};
+use crate::receive::execute_receive;
+use crate::state::{ADMIN_LIST, AdminList};
+use crate::tx_order::{execute_create_order, execute_release_order};
 
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:cw1-whitelist";
@@ -32,6 +35,7 @@ pub fn instantiate(
         mutable: msg.mutable,
     };
     ADMIN_LIST.save(deps.storage, &cfg)?;
+
     Ok(Response::default())
 }
 
@@ -52,6 +56,11 @@ pub fn execute(
         ExecuteMsg::Execute { msgs } => execute_execute(deps, env, info, msgs),
         ExecuteMsg::Freeze {} => execute_freeze(deps, env, info),
         ExecuteMsg::UpdateAdmins { admins } => execute_update_admins(deps, env, info, admins),
+
+        ExecuteMsg::Receive { sender, amount, msg } => { execute_receive(deps, env, info, sender, amount, msg) }
+
+        ExecuteMsg::CreateOrder { order_id, resource, duration } => execute_create_order(deps, env, info, order_id, resource, duration),
+        ExecuteMsg::ReleaseOrder { order_id } => { execute_release_order(deps, env, info, order_id) }
     }
 }
 
@@ -61,8 +70,8 @@ pub fn execute_execute<T>(
     info: MessageInfo,
     msgs: Vec<CosmosMsg<T>>,
 ) -> Result<Response<T>, ContractError>
-where
-    T: Clone + fmt::Debug + PartialEq + JsonSchema,
+    where
+        T: Clone + fmt::Debug + PartialEq + JsonSchema,
 {
     if !can_execute(deps.as_ref(), info.sender.as_ref())? {
         Err(ContractError::Unauthorized {})
@@ -145,9 +154,10 @@ pub fn query_can_execute(
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use cosmwasm_std::{BankMsg, coin, coins, StakingMsg, SubMsg, WasmMsg};
     use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
-    use cosmwasm_std::{coin, coins, BankMsg, StakingMsg, SubMsg, WasmMsg};
+
+    use super::*;
 
     #[test]
     fn instantiate_and_modify_config() {
@@ -241,13 +251,13 @@ mod tests {
                 to_address: bob.to_string(),
                 amount: coins(10000, "DAI"),
             }
-            .into(),
+                .into(),
             WasmMsg::Execute {
                 contract_addr: "some contract".into(),
                 msg: to_json_binary(&freeze).unwrap(),
                 funds: vec![],
             }
-            .into(),
+                .into(),
         ];
 
         // make some nice message

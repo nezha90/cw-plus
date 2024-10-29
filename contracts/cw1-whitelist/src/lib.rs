@@ -18,6 +18,8 @@ For more information on this contract, please check out the
 [README](https://github.com/CosmWasm/cw-plus/blob/main/contracts/cw1-whitelist/README.md).
 */
 
+pub use crate::error::ContractError;
+
 pub mod contract;
 pub mod error;
 #[cfg(test)]
@@ -25,5 +27,9 @@ mod integration_tests;
 pub mod msg;
 pub mod state;
 pub mod type_order;
+pub mod tx_order;
+pub mod type_resource;
+pub mod receive;
+pub mod common;
+pub mod consts;
 
-pub use crate::error::ContractError;
