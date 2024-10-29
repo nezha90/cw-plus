@@ -85,7 +85,7 @@ pub fn execute_release_order(
     let wasm_msg = transfer(
         env.contract.address.to_string(),
         order.initiator.to_string(),
-        Uint128::from(overage));
+        Uint128::from(overage))?;
 
     Ok(Response::new()
         .add_message(wasm_msg)
