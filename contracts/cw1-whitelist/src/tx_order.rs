@@ -1,10 +1,11 @@
-use cosmwasm_std::{Binary, DepsMut, Env, MessageInfo, Response, Uint128};
+use cosmwasm_std::{Binary, DepsMut, Env, MessageInfo, Response, Uint128, to_json_binary};
 
 use crate::common::{send, transfer, money_action, MoneyAction};
 use crate::consts::{ORDER_MAP, ORDER_MIN_DURATION};
 use crate::ContractError;
 use crate::type_order::{Order, Resource};
 use crate::state::ADMIN_LIST;
+use crate::receive::ReceiveMsg;
 
 // 创建订单
 pub fn execute_create_order(
@@ -46,14 +47,16 @@ pub fn execute_create_order(
     );
 
     // 保存订单
-    ORDER_MAP.save(deps.storage, order_id, &order)?;
+    ORDER_MAP.save(deps.storage, order_id.clone(), &order)?;
 
     // 构建转账至合约的消息
+    let msg = to_json_binary(&ReceiveMsg::CreateOrder { order_id})?;
+
     let wasm_msg = send(
         "".to_string(),
         env.contract.address.to_string(),
         Uint128::from(total_cost),
-        Binary::new(Vec::new()),
+        msg,
     )?;
 
     // 返回响应，确认订单创建成功
@@ -155,7 +158,7 @@ pub fn execute_extend(
     duration: u64,
 ) -> Result<Response, ContractError> {
     // 加载订单
-    let mut order = ORDER_MAP.load(deps.storage, order_id.clone())?;
+    let order = ORDER_MAP.load(deps.storage, order_id.clone())?;
 
     // 仅使用者可以续期订单
     if !order.is_initiator(info.sender){
@@ -175,13 +178,13 @@ pub fn execute_extend(
 
     // 构建转账至合约的消息
     // 合约收到对应金额后修改订单状态
+    let msg = to_json_binary(&ReceiveMsg::ExtendOrder { order_id, locked_funds: price, duration})?;
     let wasm_msg = send(
         "".to_string(),
         env.contract.address.to_string(),
         Uint128::from(shortage),
-        Binary::new(Vec::new()),
+        msg,
     )?;
-
 
     Ok(Response::new()
         .add_message(wasm_msg)
