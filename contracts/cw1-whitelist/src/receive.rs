@@ -10,6 +10,7 @@ use crate::common::{money_action, MoneyAction};
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug)]
 pub enum ReceiveMsg {
     CreateOrder { order_id: String },
+    ExtendOrder { order_id: String, locked_funds: u128, duration: u64 },
 }
 
 pub fn execute_receive(
@@ -39,6 +40,31 @@ pub fn execute_receive(
 
             Ok(Response::new()
                 .add_attribute("action", "receive")
+                .add_attribute("internal", "create_order")
+                .add_attribute("sender", sender)
+                .add_attribute("amount", amount)
+                .add_attribute("order_id", order_id))
+        }
+        ReceiveMsg::ExtendOrder { order_id, locked_funds, duration} => {
+            ORDER_MAP.update(deps.storage, order_id.clone(), |order: Option<Order>| {
+                let mut order = order.ok_or(ContractError::NotFound)?;
+
+                if order.locked_funds + u128::from(amount) != locked_funds {
+                    return Err(ContractError::InsufficientFunds);
+                }
+
+                order.locked_funds = locked_funds;
+                order.duration = duration;
+
+                Ok::<Order, ContractError>(order)
+            })?;
+
+            // 增加总锁定金额
+            money_action(deps.storage, MoneyAction::AddLocked, amount)?;
+
+            Ok(Response::new()
+                .add_attribute("action", "receive")
+                .add_attribute("internal", "extend")
                 .add_attribute("sender", sender)
                 .add_attribute("amount", amount)
                 .add_attribute("order_id", order_id))

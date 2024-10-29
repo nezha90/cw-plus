@@ -48,7 +48,7 @@ pub fn execute_create_order(
     // 保存订单
     ORDER_MAP.save(deps.storage, order_id, &order)?;
 
-    // 构建转账消息
+    // 构建转账至合约的消息
     let wasm_msg = send(
         "".to_string(),
         env.contract.address.to_string(),
@@ -143,5 +143,50 @@ pub fn execute_withdraw(
         .add_message(wasm_msg)
         .add_attribute("action", "withdraw")
         .add_attribute("amount", amount)
+    )
+}
+
+// 订单续期
+pub fn execute_extend(
+    deps: DepsMut,
+    env: Env,
+    info: MessageInfo,
+    order_id: String,
+    duration: u64,
+) -> Result<Response, ContractError> {
+    // 加载订单
+    let mut order = ORDER_MAP.load(deps.storage, order_id.clone())?;
+
+    // 仅使用者可以续期订单
+    if !order.is_initiator(info.sender){
+        return Err(ContractError::Unauthorized {});
+    }
+
+    // 不需要续期
+    if duration < order.duration {
+        return Err(ContractError::BadRequest {});
+    }
+
+    // 新的总金额
+    let price = Order::calc_price(&order.resource, duration);
+
+    // 需补充的
+    let shortage = price - order.locked_funds;
+
+    // 构建转账至合约的消息
+    // 合约收到对应金额后修改订单状态
+    let wasm_msg = send(
+        "".to_string(),
+        env.contract.address.to_string(),
+        Uint128::from(shortage),
+        Binary::new(Vec::new()),
+    )?;
+
+
+    Ok(Response::new()
+        .add_message(wasm_msg)
+        .add_attribute("action", "extend")
+        .add_attribute("order_id", order_id)
+        .add_attribute("shortage", shortage)
     )
 }
