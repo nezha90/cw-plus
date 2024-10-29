@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::ContractError;
 use crate::consts::{CPU_UNIT_PRICE, MEM_UNIT_PRICE, DISK_UNIT_PRICE};
-use crate::common::MoneyAction::AddLocked;
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug, Default)]
 pub enum OrderStatus {
