@@ -187,6 +187,6 @@ pub fn execute_extend(
         .add_message(wasm_msg)
         .add_attribute("action", "extend")
         .add_attribute("order_id", order_id)
-        .add_attribute("shortage", shortage)
+        .add_attribute("shortage", Uint128::from(shortage))
     )
 }
