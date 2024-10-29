@@ -6,7 +6,6 @@ use cosmwasm_std::{
 };
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cw20_base::contract;
 use cw2::set_contract_version;
 use schemars::JsonSchema;
 

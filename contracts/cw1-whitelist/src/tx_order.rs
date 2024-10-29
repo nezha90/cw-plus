@@ -1,13 +1,9 @@
-use cosmwasm_std::{Binary, DepsMut, Env, MessageInfo, Response, to_json_binary, Uint128, };
-use cw20_base::contract::{execute, query};
-use cw20_base::msg::{ExecuteMsg, QueryMsg};
-use cw_storage_plus::{Item, Map};
-use sha2::{Sha256};
+use cosmwasm_std::{Binary, DepsMut, Env, MessageInfo, Response, Uint128};
 
-use crate::common::{check_deposit, create_order_id, send, transfer};
+use crate::common::{send, transfer};
 use crate::consts::{ORDER_MAP, ORDER_MIN_DURATION};
 use crate::ContractError;
-use crate::type_order::{DEFAULT_DENOM, HandleAction, Order, OrderStatus, Resource};
+use crate::type_order::{Order, Resource};
 
 pub fn execute_create_order(
     deps: DepsMut,
