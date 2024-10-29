@@ -5,6 +5,7 @@ use crate::ContractError;
 use crate::tx_order::ORDER_MAP;
 use crate::type_order::{Order, OrderStatus};
 
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug)]
 pub enum ReceiveMsg {
     CreateOrder { order_id: String },
 }
@@ -22,13 +23,13 @@ pub fn execute_receive(
             ORDER_MAP.update(deps.storage, order_id.clone(), |order: Option<Order>| {
                 let mut order = order.ok_or(ContractError::NotFound)?;
 
-                if order.locked_funds != amount as u128 {
+                if order.locked_funds != u128::from(amount) {
                     return Err(ContractError::InsufficientFunds);
                 }
 
                 order.activation()?;
 
-                Ok::<Response, ContractError>(order)
+                Ok::<Order, ContractError>(order)
             })?;
 
             Ok(Response::new()
