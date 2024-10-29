@@ -1,9 +1,8 @@
-use cosmwasm_std::{Addr, BankMsg, Binary, Coin, DepsMut, Env, from_json, MessageInfo, Response, StdResult, Uint128, wasm_execute, WasmMsg, WasmQuery};
+use cosmwasm_std::{Binary, DepsMut, Env, from_json, MessageInfo, Response, Uint128};
 
 use crate::consts::ORDER_MAP;
 use crate::ContractError;
-use crate::tx_order::ORDER_MAP;
-use crate::type_order::{Order, OrderStatus};
+use crate::type_order::{Order};
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug)]
 pub enum ReceiveMsg {
