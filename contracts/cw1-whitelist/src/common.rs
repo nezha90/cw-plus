@@ -65,12 +65,12 @@ pub fn money_action(storage: &mut dyn Storage,action: MoneyAction, amount: Uint1
 
             earnings += amount;
 
-            LOCEARNINGSKED.save(storage, &earnings)?;
+            EARNINGS.save(storage, &earnings)?;
         }
         MoneyAction::DelEarnings => {
             let mut earnings = EARNINGS.load(storage)?;
 
-            if locked < amount {
+            if earnings < amount {
                 return Err(ContractError::InsufficientFunds)
             }
 
