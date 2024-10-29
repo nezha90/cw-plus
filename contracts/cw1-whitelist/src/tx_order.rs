@@ -110,7 +110,7 @@ pub fn execute_release_order(
 pub fn execute_withdraw(
     deps: DepsMut,
     env: Env,
-    _info: MessageInfo,
+    info: MessageInfo,
     beneficiary: String,
     amount: Uint128,
 ) -> Result<Response, ContractError> {
