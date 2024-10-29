@@ -4,8 +4,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::ContractError;
 
-pub const DEFAULT_DENOM: &str = "uttnt";
-
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug, Default)]
 pub enum OrderStatus {
     #[default]
@@ -112,9 +110,8 @@ impl Order {
             self.duration
         };
 
-        if self.duration - duration <
 
-            Ok(duration as u128 * unit_price)
+        Ok(u128::from(duration) * unit_price)
     }
 
     pub fn activation(&mut self) -> Result<(), ContractError> {

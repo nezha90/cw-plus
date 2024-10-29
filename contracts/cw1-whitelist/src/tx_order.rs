@@ -6,7 +6,7 @@ use cosmwasm_std::{Addr, BankMsg, Binary, Coin, DepsMut, Env,
 use cw20_base::contract::{execute, query};
 use cw20_base::msg::{ExecuteMsg, QueryMsg};
 use cw_storage_plus::{Item, Map};
-use sha2::{Digest, Sha256};
+use sha2::{Sha256};
 
 use crate::common::{check_deposit, create_order_id, send, transfer};
 use crate::consts::{ORDER_MAP, ORDER_MIN_DURATION};
