@@ -35,6 +35,9 @@ pub enum ExecuteMsg<T = Empty>
 
     //Release Order
     ReleaseOrder { order_id: String },
+
+    //Withdraw
+    WithDraw {beneficiary: String, amount: Uint128},
 }
 
 #[cw_serde]
