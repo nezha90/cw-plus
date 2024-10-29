@@ -48,7 +48,8 @@ pub struct Resource {
     // CPU 核数
     pub memory: u128,
     // 内存大小 单位G
-    pub disk: u128,              // 硬盘大小 单位G
+    pub disk: u128,
+    // 硬盘大小 单位G
 }
 
 impl Order {
@@ -71,6 +72,7 @@ impl Order {
         }
     }
 
+    #[warn(dead_code)]
     fn change_resource(&mut self, resource: Resource) {
         self.resource = resource
     }

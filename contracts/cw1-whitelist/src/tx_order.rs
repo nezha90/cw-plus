@@ -1,6 +1,6 @@
 use cosmwasm_std::{Binary, DepsMut, Env, MessageInfo, Response, Uint128};
 
-use crate::common::{send, transfer};
+use crate::common::{send, transfer, money_action, MoneyAction};
 use crate::consts::{ORDER_MAP, ORDER_MIN_DURATION};
 use crate::ContractError;
 use crate::type_order::{Order, Resource};
@@ -72,14 +72,24 @@ pub fn execute_release_order(
     // 加载订单
     let mut order = ORDER_MAP.load(deps.storage, order_id.clone())?;
 
+    // 得到总金额
+
+    let locked_funds = order.locked_funds;
+
     // 计算实际消费并修改订单状态
     let price = order.release(env.block.height)?;
 
     // 退还余额
-    let overage = order.locked_funds - price;
+    let overage = locked_funds - price;
 
     // 保存订单状态
     ORDER_MAP.save(deps.storage, order_id.clone(), &order)?;
+
+    // 减少总锁定金额数量
+    money_action(deps.storage, MoneyAction::DelLocked, Uint128::from(locked_funds))?;
+
+    // 增加资源提供者可提币数量
+    money_action(deps.storage, MoneyAction::AddEarnings, Uint128::from(price))?;
 
     // 构建退还余额消息
     let wasm_msg = transfer(
