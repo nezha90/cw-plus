@@ -3,6 +3,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::ContractError;
+use crate::consts::{CPU_UNIT_PRICE, MEM_UNIT_PRICE, DISK_UNIT_PRICE};
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug, Default)]
 pub enum OrderStatus {
@@ -74,16 +75,16 @@ impl Order {
         self.resource = resource
     }
 
-    pub fn calc_unit_price(resource: Resource) -> u128 {
+    pub fn calc_unit_price(resource: &Resource) -> u128 {
         (resource.cpu as u128) * CPU_UNIT_PRICE + (resource.memory as u128) * MEM_UNIT_PRICE + (resource.disk as u128) * DISK_UNIT_PRICE
     }
 
-    pub fn calc_price(resource: Resource, duration: u64) -> u128 {
+    pub fn calc_price(resource: &Resource, duration: u64) -> u128 {
         Order::calc_unit_price(resource) * duration
     }
 
     pub fn renew(&mut self, funds: u128, duration: u64) -> Result<(), ContractError> {
-        let price = Order::calc_price(resource, duration);
+        let price = Order::calc_price(&self.resource, duration);
 
         if funds < price {
             return Err(ContractError::InsufficientFunds);
@@ -102,7 +103,7 @@ impl Order {
 
         self.status = OrderStatus::Expired;
 
-        let unit_price = Order::calc_unit_price(resource);
+        let unit_price = Order::calc_unit_price(&self.resource);
 
         let duration = if current_height < self.start_height + self.duration {
             current_height - self.start_height
