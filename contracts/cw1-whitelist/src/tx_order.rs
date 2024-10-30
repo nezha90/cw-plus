@@ -1,13 +1,13 @@
 use cosmwasm_std::{DepsMut, Env, MessageInfo, Response, Uint128, to_json_binary, wasm_execute,Empty};
 
 use crate::common::{send, transfer, money_action, MoneyAction};
-use crate::consts::{ORDER_MAP, ORDER_MIN_DURATION};
+use crate::consts::{ORDER_MAP, ORDER_MIN_DURATION, RESOURCE};
 use crate::ContractError;
 use crate::type_order::{Order, Resource, OrderStatus};
 use crate::state::ADMIN_LIST;
 use crate::receive::ReceiveMsg;
 use crate::msg::ExecuteMsg;
-use crate::type_resource::{RESOURCE, TotalResource};
+use crate::type_resource::{TotalResource, Resource};
 
 // 创建订单
 pub fn execute_create_order(
@@ -30,7 +30,7 @@ pub fn execute_create_order(
     }
 
     // 计算总费用
-    let total_cost = Order::calc_price(&resource, duration);
+    let total_cost = resource.calc_price(duration)?;
 
     // 订单所有者
     let initiator = info.sender.clone();
@@ -66,7 +66,7 @@ pub fn execute_create_order(
         .add_message(wasm_msg)
         .add_attribute("action", "create_order")
         .add_attribute("order_id", order.id)
-        .add_attribute("locked_funds", total_cost.to_string())
+        .add_attribute("locked_funds", Uint128::from(total_cost))
     )
 }
 

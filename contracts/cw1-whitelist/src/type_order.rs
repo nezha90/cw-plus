@@ -3,7 +3,8 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::ContractError;
-use crate::consts::{CPU_UNIT_PRICE, MEM_UNIT_PRICE, DISK_UNIT_PRICE};
+use crate::consts::{CPU_UNIT_PRICE, MEM_UNIT_PRICE, DISK_UNIT_PRICE, HOUR};
+use crate::type_resource::Resource;
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug, Default)]
 pub enum OrderStatus {
@@ -42,16 +43,6 @@ pub struct Order {
     pub resource: Resource,      // 资源详情
 }
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug, Default)]
-pub struct Resource {
-    pub cpu: u128,
-    // CPU 核数
-    pub memory: u128,
-    // 内存大小 单位G
-    pub disk: u128,
-    // 硬盘大小 单位G
-}
-
 impl Order {
     pub fn new(
         id: String,
@@ -76,18 +67,6 @@ impl Order {
         self.initiator == sender
     }
 
-    #[warn(dead_code)]
-    fn change_resource(&mut self, resource: Resource) {
-        self.resource = resource
-    }
-
-    pub fn calc_unit_price(resource: &Resource) -> u128 {
-        (resource.cpu as u128) * CPU_UNIT_PRICE + (resource.memory as u128) * MEM_UNIT_PRICE + (resource.disk as u128) * DISK_UNIT_PRICE
-    }
-
-    pub fn calc_price(resource: &Resource, duration: u64) -> u128 {
-        Order::calc_unit_price(resource) * u128::from(duration)
-    }
 
     pub fn renew(&mut self, funds: u128, duration: u64) -> Result<(), ContractError> {
         let price = Order::calc_price(&self.resource, duration);
@@ -107,18 +86,27 @@ impl Order {
             return Err(ContractError::BadRequest);
         }
 
+        if self.start_height == current_height {
+            return Err(ContractError::BadRequest);
+        }
+
         self.status = OrderStatus::Expired;
 
-        let unit_price = Order::calc_unit_price(&self.resource);
-
-        let duration = if current_height < self.start_height + self.duration {
+        // 按实际使用时间扣费
+        let mut duration = if current_height < self.start_height + self.duration {
             current_height - self.start_height
         } else {
             self.duration
         };
 
+        // 不足一小时则按一小时计算
+        if duration % HOUR != 0 {
+            duration = ((duration / HOUR) + 1) * HOUR;
+        }
 
-        Ok(u128::from(duration) * unit_price)
+        let price = self.resource.calc_price(duration)?;
+
+        Ok(price)
     }
 
     pub fn activation(&mut self) -> Result<(), ContractError> {
