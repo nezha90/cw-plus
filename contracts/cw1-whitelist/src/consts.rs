@@ -25,8 +25,8 @@ pub const MIN_USED_DISK: i32 = 40;
 pub const MAX_USED_DISK: i32 = 4000;
 
 // 订单时长限制 1hour - 30days
-pub const ORDER_MIN_DURATION: u64 = 600;
-pub const ORDER_MAX_DURATION: u64 = 432000;
+pub const ORDER_MIN_DURATION: u64 = HOUR;
+pub const ORDER_MAX_DURATION: u64 = HOUR * 720;
 
 // 订单
 pub const ORDER_MAP: Map<String, Order> = Map::new("orders");
@@ -42,4 +42,4 @@ pub const RESOURCE: Item<TotalResource> = Item::new("total_resource");
 
 // 现实时间单位转换
 pub const MINUTE: u64 = 10;
-pub const HOUR: u64 = MINUTE * 10;
+pub const HOUR: u64 = MINUTE * 60;

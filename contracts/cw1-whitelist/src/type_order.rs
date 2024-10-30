@@ -69,7 +69,7 @@ impl Order {
 
 
     pub fn renew(&mut self, funds: u128, duration: u64) -> Result<(), ContractError> {
-        let price = Order::calc_price(&self.resource, duration);
+        let price = self.resource.calc_price(duration)?;
 
         if funds < price {
             return Err(ContractError::InsufficientFunds);

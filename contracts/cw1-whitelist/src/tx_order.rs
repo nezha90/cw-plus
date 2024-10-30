@@ -1,9 +1,9 @@
 use cosmwasm_std::{DepsMut, Env, MessageInfo, Response, Uint128, to_json_binary, wasm_execute,Empty};
 
 use crate::common::{send, transfer, money_action, MoneyAction};
-use crate::consts::{ORDER_MAP, ORDER_MIN_DURATION, RESOURCE};
+use crate::consts::{ORDER_MAP, ORDER_MIN_DURATION, RESOURCE, ORDER_MAX_DURATION};
 use crate::ContractError;
-use crate::type_order::{Order, Resource, OrderStatus};
+use crate::type_order::{Order,OrderStatus};
 use crate::state::ADMIN_LIST;
 use crate::receive::ReceiveMsg;
 use crate::msg::ExecuteMsg;
@@ -162,25 +162,15 @@ pub fn execute_withdraw(
 pub fn execute_extend(
     deps: DepsMut,
     env: Env,
-    info: MessageInfo,
+    _info: MessageInfo,
     order_id: String,
     duration: u64,
 ) -> Result<Response, ContractError> {
     // 加载订单
     let order = ORDER_MAP.load(deps.storage, order_id.clone())?;
 
-    // 仅使用者可以续期订单
-    if !order.is_initiator(info.sender){
-        return Err(ContractError::Unauthorized {});
-    }
-
-    // 不需要续期
-    if order.status != OrderStatus::Active|| duration < order.duration || order.start_height + order.duration > env.block.height{
-        return Err(ContractError::BadRequest {});
-    }
-
     // 新的总金额
-    let price = Order::calc_price(&order.resource, duration);
+    let price = order.resource.calc_price(duration)?;
 
     // 需补充的
     let shortage = price - order.locked_funds;

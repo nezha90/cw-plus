@@ -3,8 +3,7 @@ use std::fmt;
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::{Binary, CosmosMsg, Empty, Uint128};
 use schemars::JsonSchema;
-
-use crate::type_order::Resource;
+use crate::type_resource::Resource;
 
 #[cw_serde]
 pub struct InstantiateMsg {

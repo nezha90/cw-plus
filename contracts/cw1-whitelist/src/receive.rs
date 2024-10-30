@@ -2,9 +2,9 @@ use cosmwasm_std::{Binary, DepsMut, Env, from_json, MessageInfo, Response, Uint1
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::consts::{ORDER_MAP, RESOURCE};
+use crate::consts::{ORDER_MAP, RESOURCE, ORDER_MAX_DURATION};
 use crate::ContractError;
-use crate::type_order::{Order};
+use crate::type_order::{Order, OrderStatus};
 use crate::common::{money_action, MoneyAction};
 use crate::type_resource::{TotalResource};
 
@@ -58,15 +58,30 @@ pub fn execute_receive(
             ORDER_MAP.update(deps.storage, order_id.clone(), |order: Option<Order>| {
                 let mut order = order.ok_or(ContractError::NotFound)?;
 
+                // 仅使用者可以续期订单
+                if !order.is_initiator(info.sender){
+                    return Err(ContractError::Unauthorized {});
+                }
+
+                // 不需要续期
+                // 1. 订单未处于激活状态
+                // 2. 订单已经过期
+                // 3. 续期时长大于最大时长
+                // 4. 续期时长小于等于当前时长
+                if order.status != OrderStatus::Active||
+                    order.start_height + order.duration > env.block.height ||
+                    duration > ORDER_MAX_DURATION ||
+                    duration <= order.duration {
+                    return Err(ContractError::BadRequest {});
+                }
+
+                // 如果转账金额+已锁定金额不等于目标金额,则退出
                 if order.locked_funds + u128::from(amount) != locked_funds {
                     return Err(ContractError::InsufficientFunds);
                 }
 
                 order.locked_funds = locked_funds;
 
-                if duration < order.duration {
-                    return Err(ContractError::BadRequest);
-                }
                 order.duration = duration;
 
                 Ok::<Order, ContractError>(order)
