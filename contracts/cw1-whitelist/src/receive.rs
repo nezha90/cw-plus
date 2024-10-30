@@ -16,8 +16,8 @@ pub enum ReceiveMsg {
 
 pub fn execute_receive(
     deps: DepsMut,
-    _env: Env,
-    _info: MessageInfo,
+    env: Env,
+    info: MessageInfo,
     sender: String,
     amount: Uint128,
     msg: Binary,

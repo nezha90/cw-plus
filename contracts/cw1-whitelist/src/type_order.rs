@@ -3,7 +3,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::ContractError;
-use crate::consts::{CPU_UNIT_PRICE, MEM_UNIT_PRICE, DISK_UNIT_PRICE, HOUR};
+use crate::consts::{HOUR};
 use crate::type_resource::Resource;
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug, Default)]

@@ -1,4 +1,3 @@
-use cw_storage_plus::Item;
 use schemars::JsonSchema;
 use serde::{Serialize,Deserialize};
 
@@ -21,7 +20,7 @@ impl Resource {
         let mut price = self.calc_cpu_price()? + self.calc_mem_price()? + self.calc_disk_price()?;
 
         let duration_coefficient = Resource::calc_duration_coefficient(duration)?;
-        return Ok(price * duration * duration_coefficient / 10)
+        return Ok(price * u128::from(duration) * duration_coefficient / 10)
     }
 
 
@@ -73,7 +72,7 @@ impl Resource {
             return Ok(7)
         }
 
-        OK(0)
+        Ok(0)
     }
 }
 

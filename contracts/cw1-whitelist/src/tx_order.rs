@@ -24,7 +24,7 @@ pub fn execute_create_order(
     }
 
     // 资源最少使用权限
-    if duration < ORDER_MIN_DURATION {
+    if duration < ORDER_MIN_DURATION || duration > ORDER_MAX_DURATION {
         return Err(ContractError::BadRequest);
         //return Err(StdError::generic_err("Resource is not available"));
     }
