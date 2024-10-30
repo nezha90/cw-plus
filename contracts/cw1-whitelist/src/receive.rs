@@ -33,7 +33,7 @@ pub fn execute_receive(
 
                 // 增加对应的总资源使用量
                 RESOURCE.update(deps.storage, |mut total_resource| {
-                    total_resource.add_used(order.resource)?;
+                    total_resource.add_used(order.resource.clone())?;
 
                     Ok::<TotalResource, ContractError>(total_resource)
                 })?;
@@ -41,7 +41,7 @@ pub fn execute_receive(
                 // 设置订单为活跃状态
                 order.activation()?;
 
-                Ok::<Order, ContractError>(total_resource)
+                Ok::<Order, ContractError>(order)
             })?;
 
             // 增加总锁定金额数量
