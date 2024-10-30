@@ -15,7 +15,8 @@ use crate::error::ContractError;
 use crate::msg::{AdminListResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::receive::execute_receive;
 use crate::state::{ADMIN_LIST, AdminList};
-use crate::tx_order::{execute_create_order, execute_release_order, execute_withdraw};
+use crate::tx_order::{execute_create_order, execute_release_order, execute_withdraw, execute_extend, execute_update};
+use crate::tx_resource::execute_set_resource;
 
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:cw1-whitelist";
@@ -60,7 +61,12 @@ pub fn execute(
 
         ExecuteMsg::CreateOrder { order_id, resource, duration } => execute_create_order(deps, env, info, order_id, resource, duration),
         ExecuteMsg::ReleaseOrder { order_id } => execute_release_order(deps, env, info, order_id),
+        ExecuteMsg::Extend { order_id, duration } => execute_extend(deps, env, info, order_id, duration),
+        ExecuteMsg::Update { order_id, new_order_id, resource } => execute_update(deps, env, info, beneficiary, new_order_id, resource),
+
         ExecuteMsg::WithDraw { beneficiary, amount } => execute_withdraw(deps, env, info, beneficiary, amount),
+
+        ExecuteMsg::SetResource {resource} => execute_set_resource(deps,env,info,resource),
     }
 }
 

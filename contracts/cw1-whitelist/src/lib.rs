@@ -32,4 +32,5 @@ pub mod type_resource;
 pub mod receive;
 pub mod common;
 pub mod consts;
+pub mod tx_resource;
 
