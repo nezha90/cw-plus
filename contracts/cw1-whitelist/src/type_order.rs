@@ -42,7 +42,7 @@ pub struct Order {
     pub resource: Resource,      // 资源详情
 }
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug, Default)]
 pub struct Resource {
     pub cpu: u128,
     // CPU 核数
