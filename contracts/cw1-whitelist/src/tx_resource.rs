@@ -1,4 +1,4 @@
-use crate::type_resource::{Resource, TotalResource};
+use crate::type_resource::{Resource};
 use cosmwasm_std::{Env, DepsMut, MessageInfo, Response};
 use crate::ContractError;
 use crate::state::ADMIN_LIST;
