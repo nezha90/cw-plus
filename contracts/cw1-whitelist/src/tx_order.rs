@@ -3,9 +3,10 @@ use cosmwasm_std::{DepsMut, Env, MessageInfo, Response, Uint128, to_json_binary}
 use crate::common::{send, transfer, money_action, MoneyAction};
 use crate::consts::{ORDER_MAP, ORDER_MIN_DURATION};
 use crate::ContractError;
-use crate::type_order::{Order, Resource};
+use crate::type_order::{Order, Resource, OrderStatus};
 use crate::state::ADMIN_LIST;
 use crate::receive::ReceiveMsg;
+use crate::msg::ExecuteMsg;
 
 // 创建订单
 pub fn execute_create_order(
@@ -166,7 +167,7 @@ pub fn execute_extend(
     }
 
     // 不需要续期
-    if duration < order.duration {
+    if duration < order.duration || order.start_height + order.duration < env.block.height{
         return Err(ContractError::BadRequest {});
     }
 
@@ -191,5 +192,40 @@ pub fn execute_extend(
         .add_attribute("action", "extend")
         .add_attribute("order_id", order_id)
         .add_attribute("shortage", Uint128::from(shortage))
+    )
+}
+
+
+// 订单升级
+pub fn execute_update(
+    deps: DepsMut,
+    env: Env,
+    info: MessageInfo,
+    order_id: String,
+    new_order_id: String,
+    resource: Resource,
+) -> Result<Response, ContractError> {
+    // 加载订单
+    let order = ORDER_MAP.load(deps.storage, order_id.clone())?;
+
+    // 仅使用者可以升级订单
+    if !order.is_initiator(info.sender){
+        return Err(ContractError::Unauthorized {});
+    }
+
+    // 仅在活跃状态下的订单可升级
+    if !order.status != OrderStatus::Active || order.start_height + order.duration < env.block.height{
+        return Err(ContractError::BadRequest {});
+    }
+
+    let mut msgs = Vec::new();
+    msgs.push(ExecuteMsg::ReleaseOrder {order_id: order_id.clone()});
+    msgs.push(ExecuteMsg::CreateOrder {order_id:new_order_id.clone(), resource, duration: order.duration});
+
+    Ok(Response::new()
+        .add_messages(msgs)
+        .add_attribute("action", "update")
+        .add_attribute("old_order_id", order_id)
+        .add_attribute("new_order_id", new_order_id)
     )
 }
