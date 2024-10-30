@@ -7,6 +7,7 @@ use crate::type_order::{Order, Resource, OrderStatus};
 use crate::state::ADMIN_LIST;
 use crate::receive::ReceiveMsg;
 use crate::msg::ExecuteMsg;
+use crate::type_resource::{RESOURCE, TotalResource};
 
 // 创建订单
 pub fn execute_create_order(
@@ -104,6 +105,13 @@ pub fn execute_release_order(
 
     // 增加资源提供者可提币数量
     money_action(deps.storage, MoneyAction::AddEarnings, Uint128::from(price))?;
+
+    // 减少对应的使用量
+    RESOURCE.update(deps.storage, |mut total_resource| {
+        total_resource.sub_used(order.resource)?;
+
+        Ok::<TotalResource, ContractError>(total_resource)
+    })?;
 
     // 构建退还余额消息
     let wasm_msg = transfer(

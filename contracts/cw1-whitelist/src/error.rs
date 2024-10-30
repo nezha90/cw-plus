@@ -20,4 +20,7 @@ pub enum ContractError {
 
     #[error("Not Found")]
     NotFound,
+
+    #[error("Insufficient Capacity")]
+    InsufficientCapacity,
 }
