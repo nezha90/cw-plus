@@ -18,15 +18,19 @@ pub fn execute_create_order(
     resource: Resource,
     duration: u64,
 ) -> Result<Response, ContractError> {
-    //确认 Order id 唯一
-    if ORDER_MAP.may_load(deps.storage, order_id.clone())?.is_some() {
-        return Err(ContractError::AlreadyExists {});
-    }
-
     // 资源最少使用权限
     if duration < ORDER_MIN_DURATION || duration > ORDER_MAX_DURATION {
         return Err(ContractError::BadRequest);
         //return Err(StdError::generic_err("Resource is not available"));
+    }
+
+    if !resource.check() {
+        return Err(ContractError::BadRequest);
+    }
+
+    //确认 Order id 唯一
+    if ORDER_MAP.may_load(deps.storage, order_id.clone())?.is_some() {
+        return Err(ContractError::AlreadyExists {});
     }
 
     // 计算总费用
@@ -166,6 +170,10 @@ pub fn execute_extend(
     order_id: String,
     duration: u64,
 ) -> Result<Response, ContractError> {
+    if !resource.check() {
+        return Err(ContractError::BadRequest);
+    }
+
     // 加载订单
     let order = ORDER_MAP.load(deps.storage, order_id.clone())?;
 

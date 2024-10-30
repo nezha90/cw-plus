@@ -23,6 +23,11 @@ impl Resource {
         return Ok(uint_price * u128::from(duration) * duration_coefficient / 10)
     }
 
+    pub fn check(&self) -> bool {
+         !(self.cpu < 1 || self.cpu > 32 ||
+            self.disk < 1 || self.memory > 64 ||
+            self.disk < 40 || self.disk > 4000)
+    }
 
     fn calc_cpu_price(&self) -> Result<u128, ContractError> {
         let price = u128::from(self.cpu) * CPU_UNIT_PRICE * match self.cpu {

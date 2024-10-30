@@ -67,20 +67,6 @@ impl Order {
         self.initiator == sender
     }
 
-
-    pub fn renew(&mut self, funds: u128, duration: u64) -> Result<(), ContractError> {
-        let price = self.resource.calc_price(duration)?;
-
-        if funds < price {
-            return Err(ContractError::InsufficientFunds);
-        }
-
-        self.duration += duration;
-        self.locked_funds += funds;
-
-        return Ok(());
-    }
-
     pub fn release(&mut self, current_height: u64) -> Result<u128, ContractError> {
         if self.status != OrderStatus::Active {
             return Err(ContractError::BadRequest);
