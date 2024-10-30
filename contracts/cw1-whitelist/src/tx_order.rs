@@ -1,4 +1,4 @@
-use cosmwasm_std::{DepsMut, Env, MessageInfo, Response, Uint128, to_json_binary, wasm_execute};
+use cosmwasm_std::{DepsMut, Env, MessageInfo, Response, Uint128, to_json_binary, wasm_execute,Empty};
 
 use crate::common::{send, transfer, money_action, MoneyAction};
 use crate::consts::{ORDER_MAP, ORDER_MIN_DURATION};
@@ -223,14 +223,14 @@ pub fn execute_update(
     // 释放旧订单消息
     let release_msg = wasm_execute(
         env.contract.address.clone(),
-        &ExecuteMsg::ReleaseOrder {order_id: order_id.clone()},
+        &ExecuteMsg::<Empty>::ReleaseOrder {order_id: order_id.clone()},
         Vec::new(),
     )?;
 
     // 创建新订单消息
     let create_msg = wasm_execute(
         env.contract.address,
-        &ExecuteMsg::CreateOrder {order_id:new_order_id.clone(), resource, duration: order.duration},
+        &ExecuteMsg::<Empty>::CreateOrder {order_id:new_order_id.clone(), resource, duration: order.duration},
         Vec::new(),
     )?;
     msgs.push(release_msg);
