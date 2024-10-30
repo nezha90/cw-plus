@@ -1,5 +1,5 @@
 use cw_storage_plus::Item;
-
+use serde::{Serialize,Deserialize};
 
 use crate::type_order::Resource;
 use crate::ContractError;
