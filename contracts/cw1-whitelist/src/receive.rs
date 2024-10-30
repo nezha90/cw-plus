@@ -24,25 +24,23 @@ pub fn execute_receive(
 ) -> Result<Response, ContractError> {
     match from_json(&msg)? {
         ReceiveMsg::CreateOrder { order_id } => {
-            ORDER_MAP.update(deps.storage, order_id.clone(), |order: Option<Order>| {
-                let mut order = order.ok_or(ContractError::NotFound)?;
+            let mut order = ORDER_MAP.load(deps.storage, order_id.clone())?;
 
-                if order.locked_funds != u128::from(amount) {
-                    return Err(ContractError::InsufficientFunds);
-                }
+            if order.locked_funds != u128::from(amount) {
+                return Err(ContractError::InsufficientFunds);
+            }
 
-                // 增加对应的总资源使用量
-                RESOURCE.update(deps.storage, |mut total_resource| {
-                    total_resource.add_used(order.resource.clone())?;
+            // 增加对应的总资源使用量
+            RESOURCE.update(deps.storage, |mut total_resource| {
+                total_resource.add_used(order.resource.clone())?;
 
-                    Ok::<TotalResource, ContractError>(total_resource)
-                })?;
-
-                // 设置订单为活跃状态
-                order.activation()?;
-
-                Ok::<Order, ContractError>(order)
+                Ok::<TotalResource, ContractError>(total_resource)
             })?;
+
+            // 设置订单为活跃状态
+            order.activation()?;
+
+            ORDER_MAP.save(deps.storage, order_id.clone(), &order)?;
 
             // 增加总锁定金额数量
             money_action(deps.storage,MoneyAction::AddLocked, amount)?;
