@@ -7,25 +7,25 @@ use crate::consts::{HOUR, CPU_UNIT_PRICE, MEM_UNIT_PRICE, DISK_UNIT_PRICE};
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug, Default)]
 pub struct Resource {
-    pub cpu: u128,
+    pub cpu: u32,
     // CPU 核数
-    pub memory: u128,
+    pub memory: u32,
     // 内存大小 单位G
-    pub disk: u128,
+    pub disk: u32,
     // 硬盘大小 单位G
 }
 
 impl Resource {
     pub fn calc_price(&self, duration: u64) -> Result<u128, ContractError> {
-        let mut price = self.calc_cpu_price()? + self.calc_mem_price()? + self.calc_disk_price()?;
+        let uint_price = self.calc_cpu_price()? + self.calc_mem_price()? + self.calc_disk_price()?;
 
         let duration_coefficient = Resource::calc_duration_coefficient(duration)?;
-        return Ok(price * u128::from(duration) * duration_coefficient / 10)
+        return Ok(uint_price * u128::from(duration) * duration_coefficient / 10)
     }
 
 
     fn calc_cpu_price(&self) -> Result<u128, ContractError> {
-        let price = self.cpu * CPU_UNIT_PRICE * match self.cpu {
+        let price = u128::from(self.cpu) * CPU_UNIT_PRICE * match self.cpu {
             1..4 => 10,
             4..8 => 9,
             9..16 => 8,
@@ -37,7 +37,7 @@ impl Resource {
     }
 
     fn calc_mem_price(&self) -> Result<u128, ContractError> {
-        let price = self.memory * MEM_UNIT_PRICE * match self.memory {
+        let price = u128::from(self.memory) * MEM_UNIT_PRICE * match self.memory {
             1..4 => 10,
             5..16 => 9,
             17..32 => 8,
@@ -49,7 +49,7 @@ impl Resource {
     }
 
     fn calc_disk_price(&self) -> Result<u128, ContractError> {
-        let price = self.disk * DISK_UNIT_PRICE * match self.disk {
+        let price = u128::from(self.disk) * DISK_UNIT_PRICE * match self.disk {
             40..100 => 10,
             101..500 => 8,
             501..2000 => 6,
