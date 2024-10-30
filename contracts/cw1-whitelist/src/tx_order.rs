@@ -170,10 +170,6 @@ pub fn execute_extend(
     order_id: String,
     duration: u64,
 ) -> Result<Response, ContractError> {
-    if !resource.check() {
-        return Err(ContractError::BadRequest);
-    }
-
     // 加载订单
     let order = ORDER_MAP.load(deps.storage, order_id.clone())?;
 
