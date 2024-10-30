@@ -1,4 +1,4 @@
-use cosmwasm_std::{DepsMut, Env, MessageInfo, Response, Uint128, to_json_binary};
+use cosmwasm_std::{DepsMut, Env, MessageInfo, Response, Uint128, to_json_binary, wasm_execute};
 
 use crate::common::{send, transfer, money_action, MoneyAction};
 use crate::consts::{ORDER_MAP, ORDER_MIN_DURATION};
@@ -167,7 +167,7 @@ pub fn execute_extend(
     }
 
     // 不需要续期
-    if duration < order.duration || order.start_height + order.duration < env.block.height{
+    if order.status != OrderStatus::Active|| duration < order.duration || order.start_height + order.duration > env.block.height{
         return Err(ContractError::BadRequest {});
     }
 
@@ -214,13 +214,27 @@ pub fn execute_update(
     }
 
     // 仅在活跃状态下的订单可升级
-    if !order.status != OrderStatus::Active || order.start_height + order.duration < env.block.height{
+    if order.status != OrderStatus::Active || order.start_height + order.duration > env.block.height{
         return Err(ContractError::BadRequest {});
     }
 
     let mut msgs = Vec::new();
-    msgs.push(ExecuteMsg::ReleaseOrder {order_id: order_id.clone()});
-    msgs.push(ExecuteMsg::CreateOrder {order_id:new_order_id.clone(), resource, duration: order.duration});
+
+    // 释放旧订单消息
+    let release_msg = wasm_execute(
+        env.contract.address.clone(),
+        &ExecuteMsg::ReleaseOrder {order_id: order_id.clone()},
+        Vec::new(),
+    )?;
+
+    // 创建新订单消息
+    let create_msg = wasm_execute(
+        env.contract.address,
+        &ExecuteMsg::CreateOrder {order_id:new_order_id.clone(), resource, duration: order.duration},
+        Vec::new(),
+    )?;
+    msgs.push(release_msg);
+    msgs.push(create_msg);
 
     Ok(Response::new()
         .add_messages(msgs)
