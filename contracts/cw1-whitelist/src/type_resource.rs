@@ -26,10 +26,10 @@ impl Resource {
 
     fn calc_cpu_price(&self) -> Result<u128, ContractError> {
         let price = u128::from(self.cpu) * CPU_UNIT_PRICE * match self.cpu {
-            1..4 => 10,
-            4..8 => 9,
-            9..16 => 8,
-            17..32 => 7,
+            1..=4 => 10,
+            5..=8 => 9,
+            9..=16 => 8,
+            17..=32 => 7,
             _ => {return Err(ContractError::BadRequest)}
         } / 10;
 
@@ -38,10 +38,10 @@ impl Resource {
 
     fn calc_mem_price(&self) -> Result<u128, ContractError> {
         let price = u128::from(self.memory) * MEM_UNIT_PRICE * match self.memory {
-            1..4 => 10,
-            5..16 => 9,
-            17..32 => 8,
-            33..64 => 7,
+            1..=4 => 10,
+            5..=16 => 9,
+            17..=32 => 8,
+            33..=64 => 7,
             _ => {return Err(ContractError::BadRequest)}
         } / 10;
 
@@ -50,10 +50,10 @@ impl Resource {
 
     fn calc_disk_price(&self) -> Result<u128, ContractError> {
         let price = u128::from(self.disk) * DISK_UNIT_PRICE * match self.disk {
-            40..100 => 10,
-            101..500 => 8,
-            501..2000 => 6,
-            2001..4000 => 5,
+            40..=100 => 10,
+            101..=500 => 8,
+            501..=2000 => 6,
+            2001..=4000 => 5,
             _ => {return Err(ContractError::BadRequest)}
         } / 10;
 
