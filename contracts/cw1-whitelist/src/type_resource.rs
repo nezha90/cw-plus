@@ -1,4 +1,5 @@
 use cw_storage_plus::Item;
+use schemars::JsonSchema;
 use serde::{Serialize,Deserialize};
 
 use crate::type_order::Resource;
