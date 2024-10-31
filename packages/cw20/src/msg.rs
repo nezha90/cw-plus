@@ -32,7 +32,7 @@ pub enum Cw20ExecuteMsg {
         spender: String,
         amount: Uint128,
         expires: Option<Expiration>,
-    },
+},
     /// Only with "approval" extension. Transfers amount tokens from owner -> recipient
     /// if `env.sender` has sufficient pre-approval.
     TransferFrom {

@@ -32,7 +32,7 @@ pub enum ExecuteMsg<T = Empty>
     Receive { sender: String, amount: Uint128, msg: Binary },
 
     ///Create Order
-    CreateOrder { order_id: String, resource: Resource, duration: u64 },
+    //CreateOrder { order_id: String, resource: Resource, duration: u64 },
 
     //Release Order
     ReleaseOrder { order_id: String },

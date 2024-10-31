@@ -9,8 +9,6 @@ use crate::type_resource::Resource;
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug, Default)]
 pub enum OrderStatus {
     #[default]
-    Created,      // 创建订单
-
     Active,       // 订单活跃
 
     Expired,      // 订单到期
@@ -30,7 +28,7 @@ pub enum HandleAction {
 pub struct Order {
     pub id: String,
     // 订单ID
-    pub initiator: Addr,
+    pub initiator: String,
     // 订单发起者
     pub start_height: u64,
     // 订单开始区块高度
@@ -49,7 +47,7 @@ impl Order {
         start_height: u64,
         duration: u64,
         locked_funds: u128,
-        initiator: Addr,
+        initiator: String,
         resource: Resource,
     ) -> Self {
         Order {
@@ -58,7 +56,7 @@ impl Order {
             start_height,
             duration,
             locked_funds,
-            status: OrderStatus::Created,
+            status: OrderStatus::Active,
             resource,
         }
     }
@@ -93,15 +91,5 @@ impl Order {
         let price = self.resource.calc_price(duration)?;
 
         Ok(price)
-    }
-
-    pub fn activation(&mut self) -> Result<(), ContractError> {
-        if self.status != OrderStatus::Created {
-            return Err(ContractError::BadRequest);
-        }
-
-        self.status = OrderStatus::Active;
-
-        Ok(())
     }
 }
