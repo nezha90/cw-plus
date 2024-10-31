@@ -37,7 +37,7 @@ pub fn instantiate(
     };
     ADMIN_LIST.save(deps.storage, &cfg)?;
 
-    CW20.save(deps.storage, &msg.cw20)?;
+    CW20.save(deps.storage, &msg.cw20_contract)?;
 
     Ok(Response::default())
 }

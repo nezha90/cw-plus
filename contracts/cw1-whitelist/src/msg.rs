@@ -8,7 +8,7 @@ use crate::type_resource::Resource;
 #[cw_serde]
 pub struct InstantiateMsg {
     pub admins: Vec<String>,
-    pub cw20: String,
+    pub cw20_contract: String,
     pub mutable: bool,
 }
 

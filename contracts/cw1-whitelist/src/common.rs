@@ -1,5 +1,5 @@
 use cosmwasm_std::{Env, Uint128, Binary, StdResult, wasm_execute, WasmMsg, Storage};
-use cw20_base::msg::ExecuteMsg;
+use cw20::Cw20ExecuteMsg;
 
 use crate::ContractError;
 use crate::consts::{LOCKED, EARNINGS};
@@ -7,7 +7,7 @@ use crate::consts::{LOCKED, EARNINGS};
 pub fn send(cw20: String, contract: String, amount: Uint128, msg: Binary) -> StdResult<WasmMsg> {
     wasm_execute(
         cw20,
-        &ExecuteMsg::Send { contract, amount, msg },
+        &Cw20ExecuteMsg::Send { contract, amount, msg },
         Vec::new(),
     )
 }
@@ -15,7 +15,7 @@ pub fn send(cw20: String, contract: String, amount: Uint128, msg: Binary) -> Std
 pub fn transfer(cw20: String, recipient: String, amount: Uint128) -> StdResult<WasmMsg> {
     wasm_execute(
         cw20,
-        &ExecuteMsg::Transfer { recipient, amount },
+        &Cw20ExecuteMsg::Transfer { recipient, amount },
         Vec::new(),
     )
 }
