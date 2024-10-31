@@ -10,8 +10,9 @@ use crate::type_resource::{TotalResource, Resource};
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug)]
 pub enum ReceiveMsg {
-    CreateOrder { order_id: String, initiator: String, resource: Resource, duration: u64},
+    CreateOrder { order_id: String, resource: Resource, duration: u64},
     ExtendOrder { order_id: String, duration: u64 },
+    UpdateOrder { order_id: String, new_order_id: String, resource: Resource},
 }
 
 pub fn execute_receive(
@@ -23,62 +24,11 @@ pub fn execute_receive(
     msg: Binary,
 ) -> Result<Response, ContractError> {
     match from_json(&msg)? {
-        ReceiveMsg::CreateOrder { order_id, initiator, resource, duration } => {
-            //确认 Order id 唯一
-            if ORDER_MAP.may_load(deps.storage, order_id.clone())?.is_some() {
-                return Err(ContractError::AlreadyExists {});
-            }
-
-            create_order(deps, env,info, amount, order_id, initiator, resource, duration)
+        ReceiveMsg::CreateOrder { order_id, resource, duration } => {
+            create_order(deps, env,info, amount, order_id, sender, resource, duration)
         }
         ReceiveMsg::ExtendOrder { order_id, duration} => {
-            ORDER_MAP.update(deps.storage, order_id.clone(), |order: Option<Order>| {
-                let mut order = order.ok_or(ContractError::NotFound)?;
-
-                // 仅使用者可以续期订单
-                if !order.is_initiator(info.sender.to_string()){
-                    return Err(ContractError::Unauthorized {});
-                }
-
-                // 不需要续期
-                // 1. 订单未处于激活状态
-                // 2. 订单已经过期
-                // 3. 续期时长大于最大时长
-                // 4. 续期时长小于等于当前时长
-                if order.status != OrderStatus::Active||
-                    order.start_height + order.duration > env.block.height ||
-                    duration > ORDER_MAX_DURATION ||
-                    duration <= order.duration {
-                    return Err(ContractError::BadRequest {});
-                }
-
-                // 新的总金额
-                let price = order.resource.calc_price(duration)?;
-
-                // 需补充的
-                let shortage = price - order.locked_funds;
-
-                // 如果转账金额 不等于 目标金额,则退出
-                if u128::from(amount) != shortage {
-                    return Err(ContractError::InsufficientFunds);
-                }
-
-                order.locked_funds = price;
-
-                order.duration = duration;
-
-                Ok::<Order, ContractError>(order)
-            })?;
-
-            // 增加总锁定金额
-            money_action(deps.storage, MoneyAction::AddLocked, amount)?;
-
-            Ok(Response::new()
-                .add_attribute("action", "receive")
-                .add_attribute("internal", "extend")
-                .add_attribute("sender", sender)
-                .add_attribute("amount", amount)
-                .add_attribute("order_id", order_id))
+            extend_order(deps, env, info, sender, amount, order_id, duration)
         }
     }
 }
@@ -92,7 +42,6 @@ pub fn create_order(
     initiator: String,
     resource: Resource,
     duration: u64,
-
 ) -> Result<Response, ContractError> {
     //确认 Order id 唯一
     if ORDER_MAP.may_load(deps.storage, order_id.clone())?.is_some() {
@@ -143,6 +92,58 @@ pub fn create_order(
         .add_attribute("internal", "create_order")
         .add_attribute("sender", initiator)
         .add_attribute("amount", amount)
+        .add_attribute("order_id", order_id))
+}
+
+fn extend_order(
+    deps: DepsMut,
+    env: Env,
+    _info: MessageInfo,
+    sender: String,
+    amount: Uint128,
+    order_id: String,
+    duration: u64,
+) -> Result<Response, ContractError> {
+    let mut order = ORDER_MAP.load(deps.storage, order_id.clone())?;
+
+    if !order.is_initiator(sender) {
+        return Err(ContractError::Unauthorized {})
+    }
+    // 不需要续期
+    // 1. 订单未处于激活状态
+    // 2. 订单已经过期
+    // 3. 续期时长大于最大时长
+    // 4. 续期时长小于等于当前时长
+    if order.status != OrderStatus::Active||
+        order.start_height + order.duration > env.block.height ||
+        duration > ORDER_MAX_DURATION ||
+        duration <= order.duration {
+        return Err(ContractError::BadRequest {});
+    }
+
+    // 新的总金额
+    let price = order.resource.calc_price(duration)?;
+
+    // 需补充的
+    let shortage = price - order.locked_funds;
+
+    // 如果转账金额 不等于 目标金额,则退出
+    if u128::from(amount) != shortage {
+        return Err(ContractError::InsufficientFunds);
+    }
+
+    order.locked_funds = price;
+
+    order.duration = duration;
+
+
+
+    // 增加总锁定金额
+    money_action(deps.storage, MoneyAction::AddLocked, amount)?;
+
+    Ok(Response::new()
+        .add_attribute("action", "receive")
+        .add_attribute("internal", "extend")
         .add_attribute("order_id", order_id))
 
 }
