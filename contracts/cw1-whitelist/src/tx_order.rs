@@ -103,18 +103,6 @@ pub fn execute_withdraw(
     )
 }
 
-// 订单续期
-pub fn execute_extend(
-    deps: DepsMut,
-    env: Env,
-    _info: MessageInfo,
-    order_id: String,
-    duration: u64,
-) -> Result<Response, ContractError> {
-
-}
-
-
 // 订单升级
 pub fn execute_update(
     deps: DepsMut,

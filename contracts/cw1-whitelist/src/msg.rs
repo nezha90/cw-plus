@@ -44,7 +44,7 @@ pub enum ExecuteMsg<T = Empty>
     Handle {order_id: String},
 
     // Extend
-    Extend {order_id: String, duration: u64},
+    //Extend {order_id: String, duration: u64},
     // Update Resource
     Update {order_id: String, new_order_id: String, resource: Resource},
 

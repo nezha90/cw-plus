@@ -76,7 +76,8 @@ pub fn execute(
 
         //ExecuteMsg::CreateOrder { order_id, resource, duration } => execute_create_order(deps, env, info, order_id, resource, duration),
         ExecuteMsg::ReleaseOrder { order_id } => execute_release_order(deps, env, info, order_id),
-        ExecuteMsg::Extend { order_id, duration } => execute_extend(deps, env, info, order_id, duration),
+
+        //ExecuteMsg::Extend { order_id, duration } => execute_extend(deps, env, info, order_id, duration),
         ExecuteMsg::Update { order_id, new_order_id, resource } => execute_update(deps, env, info, order_id, new_order_id, resource),
 
         ExecuteMsg::WithDraw { beneficiary, amount } => execute_withdraw(deps, env, info, beneficiary, amount),
