@@ -267,7 +267,7 @@ pub fn execute_handle(
     info: MessageInfo,
     order_id: String
 ) -> Result<Response, ContractError>  {
-    // 仅管理员可提币
+    // 仅管理员可操作
     let admin_list = ADMIN_LIST.load(deps.storage)?;
     if !admin_list.is_admin(info.sender.as_str()) {
         return Err(ContractError::Unauthorized {});
