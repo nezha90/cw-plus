@@ -29,6 +29,7 @@ pub fn instantiate(
     msg: InstantiateMsg,
 ) -> StdResult<Response> {
     set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
+
     let cfg = AdminList {
         admins: map_validate(deps.api, &msg.admins)?,
         mutable: msg.mutable,
@@ -43,7 +44,7 @@ pub fn instantiate(
     let earnings = Uint128::from(0);
     EARNINGS.save(deps.storage, &earnings)?;
 
-    let total_resource = if Some(r) = msg.resource {
+    let total_resource = if let Some(r) = msg.resource {
         TotalResource{used:Resource{cpu:0, memory: 0, disk: 0}, total: r}
     } else {
         TotalResource{used:Resource{cpu:0, memory: 0, disk: 0}, total: Resource{cpu:0, memory: 0, disk: 0}}
