@@ -103,54 +103,54 @@ pub fn execute_withdraw(
     )
 }
 
-// 订单升级
-pub fn execute_update(
-    deps: DepsMut,
-    env: Env,
-    info: MessageInfo,
-    order_id: String,
-    new_order_id: String,
-    resource: Resource,
-) -> Result<Response, ContractError> {
-    // 加载订单
-    let order = ORDER_MAP.load(deps.storage, order_id.clone())?;
-
-    // 仅使用者可以升级订单
-    if !order.is_initiator(info.sender){
-        return Err(ContractError::Unauthorized {});
-    }
-
-    // 仅在活跃状态下的订单可升级
-    if order.status != OrderStatus::Active || order.start_height + order.duration > env.block.height{
-        return Err(ContractError::BadRequest {});
-    }
-
-    let mut msgs = Vec::new();
-
-    // 释放旧订单消息
-    let release_msg = wasm_execute(
-        env.contract.address.clone(),
-        &ExecuteMsg::<Empty>::ReleaseOrder {order_id: order_id.clone()},
-        Vec::new(),
-    )?;
-
-    // 创建新订单消息
-    let create_msg = wasm_execute(
-        env.contract.address,
-        &ExecuteMsg::<Empty>::CreateOrder {order_id:new_order_id.clone(), resource, duration: order.duration},
-        Vec::new(),
-    )?;
-
-    msgs.push(release_msg);
-    msgs.push(create_msg);
-
-    Ok(Response::new()
-        .add_messages(msgs)
-        .add_attribute("action", "update")
-        .add_attribute("old_order_id", order_id)
-        .add_attribute("new_order_id", new_order_id)
-    )
-}
+// // 订单升级
+// pub fn execute_update(
+//     deps: DepsMut,
+//     env: Env,
+//     info: MessageInfo,
+//     order_id: String,
+//     new_order_id: String,
+//     resource: Resource,
+// ) -> Result<Response, ContractError> {
+//     // 加载订单
+//     let order = ORDER_MAP.load(deps.storage, order_id.clone())?;
+//
+//     // 仅使用者可以升级订单
+//     if !order.is_initiator(info.sender){
+//         return Err(ContractError::Unauthorized {});
+//     }
+//
+//     // 仅在活跃状态下的订单可升级
+//     if order.status != OrderStatus::Active || order.start_height + order.duration > env.block.height{
+//         return Err(ContractError::BadRequest {});
+//     }
+//
+//     let mut msgs = Vec::new();
+//
+//     // 释放旧订单消息
+//     let release_msg = wasm_execute(
+//         env.contract.address.clone(),
+//         &ExecuteMsg::<Empty>::ReleaseOrder {order_id: order_id.clone()},
+//         Vec::new(),
+//     )?;
+//
+//     // 创建新订单消息
+//     let create_msg = wasm_execute(
+//         env.contract.address,
+//         &ExecuteMsg::<Empty>::CreateOrder {order_id:new_order_id.clone(), resource, duration: order.duration},
+//         Vec::new(),
+//     )?;
+//
+//     msgs.push(release_msg);
+//     msgs.push(create_msg);
+//
+//     Ok(Response::new()
+//         .add_messages(msgs)
+//         .add_attribute("action", "update")
+//         .add_attribute("old_order_id", order_id)
+//         .add_attribute("new_order_id", new_order_id)
+//     )
+// }
 
 // 手动结束订单并将代币返回
 pub fn execute_handle(
