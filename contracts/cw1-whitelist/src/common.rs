@@ -1,4 +1,4 @@
-use cosmwasm_std::{Env, Uint128, Binary, StdResult, wasm_execute, WasmMsg, Storage};
+use cosmwasm_std::{Uint128, Binary, StdResult, wasm_execute, WasmMsg, Storage};
 use cw20::Cw20ExecuteMsg;
 
 use crate::ContractError;
