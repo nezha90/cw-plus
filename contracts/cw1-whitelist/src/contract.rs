@@ -12,7 +12,7 @@ use crate::error::ContractError;
 use crate::msg::{AdminListResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::receive::execute_receive;
 use crate::state::{ADMIN_LIST, AdminList};
-use crate::tx_order::{execute_create_order, execute_release_order, execute_withdraw, execute_extend, execute_update, execute_handle};
+use crate::tx_order::{execute_release_order, execute_withdraw, execute_handle};
 use crate::tx_resource::execute_set_resource;
 use crate::consts::{CW20, LOCKED, EARNINGS, RESOURCE};
 use crate::type_resource::{Resource, TotalResource};

@@ -36,7 +36,7 @@ pub fn execute_receive(
                 let mut order = order.ok_or(ContractError::NotFound)?;
 
                 // 仅使用者可以续期订单
-                if !order.is_initiator(info.sender){
+                if !order.is_initiator(info.sender.to_string()){
                     return Err(ContractError::Unauthorized {});
                 }
 

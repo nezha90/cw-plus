@@ -61,7 +61,7 @@ impl Order {
         }
     }
 
-    pub fn is_initiator(&self, sender: Addr) -> bool {
+    pub fn is_initiator(&self, sender: String) -> bool {
         self.initiator == sender
     }
 

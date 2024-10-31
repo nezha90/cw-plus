@@ -1,13 +1,11 @@
-use cosmwasm_std::{DepsMut, Env, MessageInfo, Response, Uint128, to_json_binary, wasm_execute,Empty};
+use cosmwasm_std::{DepsMut, Env, MessageInfo, Response, Uint128};
 
-use crate::common::{send, transfer, money_action, MoneyAction};
-use crate::consts::{ORDER_MAP, ORDER_MIN_DURATION, RESOURCE, ORDER_MAX_DURATION, CW20};
+use crate::common::{transfer, money_action, MoneyAction};
+use crate::consts::{ORDER_MAP, RESOURCE, CW20};
 use crate::ContractError;
-use crate::type_order::{Order,OrderStatus};
+use crate::type_order::{OrderStatus};
 use crate::state::ADMIN_LIST;
-use crate::receive::ReceiveMsg;
-use crate::msg::ExecuteMsg;
-use crate::type_resource::{TotalResource, Resource};
+use crate::type_resource::{TotalResource};
 
 // 结束订单
 pub fn execute_release_order(
@@ -23,7 +21,7 @@ pub fn execute_release_order(
     let mut order = ORDER_MAP.load(deps.storage, order_id.clone())?;
 
     // 仅管理员和使用者可以结束订单
-    if !admin_list.is_admin(info.sender.as_str()) && !order.is_initiator(info.sender){
+    if !admin_list.is_admin(info.sender.as_str()) && !order.is_initiator(info.sender.to_string()){
         return Err(ContractError::Unauthorized {});
     }
 
