@@ -33,5 +33,4 @@ pub mod receive;
 pub mod common;
 pub mod consts;
 pub mod tx_resource;
-pub mod tx_cw20;
 

@@ -299,7 +299,7 @@ pub fn execute_handle(
     money_action(deps.storage, MoneyAction::DelLocked, locked_funds)?;
 
     Ok(Response::new()
-        .add_messages(wasm_msg)
+        .add_message(wasm_msg)
         .add_attribute("action", "handle_order")
         .add_attribute("order_id", order_id)
         .add_attribute("locked_funds", locked_funds)
