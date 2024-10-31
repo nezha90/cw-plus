@@ -40,6 +40,8 @@ pub const EARNINGS: Item<Uint128> = Item::new("earnings");
 // 资源使用情况
 pub const RESOURCE: Item<TotalResource> = Item::new("total_resource");
 
+pub const CW20: Item<String> = Item::new("cw20_contract");
+
 // 现实时间单位转换
 pub const MINUTE: u64 = 10;
 pub const HOUR: u64 = MINUTE * 60;

@@ -8,6 +8,7 @@ use crate::type_resource::Resource;
 #[cw_serde]
 pub struct InstantiateMsg {
     pub admins: Vec<String>,
+    pub cw20: String,
     pub mutable: bool,
 }
 
@@ -37,6 +38,9 @@ pub enum ExecuteMsg<T = Empty>
 
     //Withdraw
     WithDraw {beneficiary: String, amount: Uint128},
+
+    //Handle
+    Handle {order_id: String},
 
     // Extend
     Extend {order_id: String, duration: u64},

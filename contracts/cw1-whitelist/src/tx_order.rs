@@ -1,7 +1,7 @@
 use cosmwasm_std::{DepsMut, Env, MessageInfo, Response, Uint128, to_json_binary, wasm_execute,Empty};
 
 use crate::common::{send, transfer, money_action, MoneyAction};
-use crate::consts::{ORDER_MAP, ORDER_MIN_DURATION, RESOURCE, ORDER_MAX_DURATION};
+use crate::consts::{ORDER_MAP, ORDER_MIN_DURATION, RESOURCE, ORDER_MAX_DURATION, CW20};
 use crate::ContractError;
 use crate::type_order::{Order,OrderStatus};
 use crate::state::ADMIN_LIST;
@@ -55,11 +55,14 @@ pub fn execute_create_order(
     // 保存订单
     ORDER_MAP.save(deps.storage, order_id.clone(), &order)?;
 
+    // 获取合约地址
+    let cw20 = CW20.load(deps.storage)?;
+
     // 构建转账至合约的消息
     let msg = to_json_binary(&ReceiveMsg::CreateOrder { order_id})?;
 
     let wasm_msg = send(
-        "".to_string(),
+        cw20,
         env.contract.address.to_string(),
         Uint128::from(total_cost),
         msg,
@@ -117,15 +120,18 @@ pub fn execute_release_order(
         Ok::<TotalResource, ContractError>(total_resource)
     })?;
 
+    // 获取合约地址
+    let cw20 = CW20.load(deps.storage)?;
+
     // 构建退还余额消息
     let wasm_msg = transfer(
-        "".to_string(),
+        cw20,
         order.initiator.to_string(),
         Uint128::from(overage))?;
 
     Ok(Response::new()
         .add_message(wasm_msg)
-        .add_attribute("action", "end_order")
+        .add_attribute("action", "release_order")
         .add_attribute("order_id", order_id)
         .add_attribute("cost", Uint128::from(price))
         .add_attribute("overage", Uint128::from(overage))
@@ -135,7 +141,7 @@ pub fn execute_release_order(
 // 管理员提币到指定地址
 pub fn execute_withdraw(
     deps: DepsMut,
-    env: Env,
+    _env: Env,
     info: MessageInfo,
     beneficiary: String,
     amount: Uint128,
@@ -149,9 +155,12 @@ pub fn execute_withdraw(
     // 减少资源提供者可提币数量
     money_action(deps.storage, MoneyAction::DelEarnings, amount)?;
 
+    // 获取合约地址
+    let cw20 = CW20.load(deps.storage)?;
+
     // 构建退还余额消息
     let wasm_msg = transfer(
-        env.contract.address.to_string(),
+        cw20,
         beneficiary,
         Uint128::from(amount))?;
 
@@ -179,11 +188,15 @@ pub fn execute_extend(
     // 需补充的
     let shortage = price - order.locked_funds;
 
+    // 获取合约地址
+    let cw20 = CW20.load(deps.storage)?;
+
     // 构建转账至合约的消息
     // 合约收到对应金额后修改订单状态
     let msg = to_json_binary(&ReceiveMsg::ExtendOrder { order_id: order_id.clone(), locked_funds: price, duration})?;
+
     let wasm_msg = send(
-        "".to_string(),
+        cw20,
         env.contract.address.to_string(),
         Uint128::from(shortage),
         msg,
@@ -235,6 +248,7 @@ pub fn execute_update(
         &ExecuteMsg::<Empty>::CreateOrder {order_id:new_order_id.clone(), resource, duration: order.duration},
         Vec::new(),
     )?;
+
     msgs.push(release_msg);
     msgs.push(create_msg);
 
@@ -243,5 +257,51 @@ pub fn execute_update(
         .add_attribute("action", "update")
         .add_attribute("old_order_id", order_id)
         .add_attribute("new_order_id", new_order_id)
+    )
+}
+
+// 手动结束订单并将代币返回
+pub fn execute_handle(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    order_id: String
+) -> Result<Response, ContractError>  {
+    // 仅管理员可提币
+    let admin_list = ADMIN_LIST.load(deps.storage)?;
+    if !admin_list.is_admin(info.sender.as_str()) {
+        return Err(ContractError::Unauthorized {});
+    }
+
+    // 加载订单
+    let mut order = ORDER_MAP.load(deps.storage, order_id.clone())?;
+
+    let locked_funds = Uint128::from(order.locked_funds);
+
+    let recipient = order.initiator.clone().to_string();
+
+    // 获取合约地址
+    let cw20 = CW20.load(deps.storage)?;
+
+    // 构建退还锁定代币消息
+    let wasm_msg = transfer(
+        cw20,
+        recipient,
+        locked_funds,
+    )?;
+
+    // 结束订单
+    order.status = OrderStatus::Expired;
+
+    ORDER_MAP.save(deps.storage, order_id.clone(), &order)?;
+
+    // 减少资源提供者可提币数量
+    money_action(deps.storage, MoneyAction::DelLocked, locked_funds)?;
+
+    Ok(Response::new()
+        .add_messages(wasm_msg)
+        .add_attribute("action", "handle_order")
+        .add_attribute("order_id", order_id)
+        .add_attribute("locked_funds", locked_funds)
     )
 }

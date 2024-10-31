@@ -18,17 +18,17 @@ pub fn create_order_id(env: Env, index: usize) -> String {
     format!("{:?}", result)
 }
 
-pub fn send(cw20_contract: String, contract: String, amount: Uint128, msg: Binary) -> StdResult<WasmMsg> {
+pub fn send(cw20: String, contract: String, amount: Uint128, msg: Binary) -> StdResult<WasmMsg> {
     wasm_execute(
-        cw20_contract,
+        cw20,
         &ExecuteMsg::Send { contract, amount, msg },
         Vec::new(),
     )
 }
 
-pub fn transfer(cw20_contract: String, recipient: String, amount: Uint128) -> StdResult<WasmMsg> {
+pub fn transfer(cw20: String, recipient: String, amount: Uint128) -> StdResult<WasmMsg> {
     wasm_execute(
-        cw20_contract,
+        cw20,
         &ExecuteMsg::Transfer { recipient, amount },
         Vec::new(),
     )
