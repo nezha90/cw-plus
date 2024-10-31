@@ -38,10 +38,10 @@ pub fn instantiate(
 
     CW20.save(deps.storage, &msg.cw20_contract)?;
 
-    let locked = Uint128::from(0);
+    let locked = Uint128::MIN;
     LOCKED.save(deps.storage, &locked)?;
 
-    let earnings = Uint128::from(0);
+    let earnings = Uint128::MIN;
     EARNINGS.save(deps.storage, &earnings)?;
 
     let total_resource = if let Some(r) = msg.resource {
