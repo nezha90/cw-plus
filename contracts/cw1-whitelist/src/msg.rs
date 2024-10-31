@@ -10,6 +10,7 @@ pub struct InstantiateMsg {
     pub admins: Vec<String>,
     pub cw20_contract: String,
     pub mutable: bool,
+    pub resource: Option<Resource>,
 }
 
 #[cw_serde]

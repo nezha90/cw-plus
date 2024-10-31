@@ -1,9 +1,6 @@
 use std::fmt;
 
-use cosmwasm_std::{
-    Addr, Api, Binary, CosmosMsg, Deps, DepsMut, Empty, Env, MessageInfo, Response, StdResult,
-    to_json_binary,
-};
+use cosmwasm_std::{Addr, Api, Binary, CosmosMsg, Deps, DepsMut, Empty, Env, MessageInfo, Response, StdResult, to_json_binary, Uint128};
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cw2::set_contract_version;
@@ -17,7 +14,8 @@ use crate::receive::execute_receive;
 use crate::state::{ADMIN_LIST, AdminList};
 use crate::tx_order::{execute_create_order, execute_release_order, execute_withdraw, execute_extend, execute_update, execute_handle};
 use crate::tx_resource::execute_set_resource;
-use crate::consts::CW20;
+use crate::consts::{CW20, LOCKED, EARNINGS, RESOURCE};
+use crate::type_resource::{Resource, TotalResource};
 
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:cw1-whitelist";
@@ -38,6 +36,19 @@ pub fn instantiate(
     ADMIN_LIST.save(deps.storage, &cfg)?;
 
     CW20.save(deps.storage, &msg.cw20_contract)?;
+
+    let locked = Uint128::from(0);
+    LOCKED.save(deps.storage, &locked)?;
+
+    let earnings = Uint128::from(0);
+    EARNINGS.save(deps.storage, &earnings)?;
+
+    let total_resource = if Some(r) = msg.resource {
+        TotalResource{used:Resource{cpu:0, memory: 0, disk: 0}, total: r}
+    } else {
+        TotalResource{used:Resource{cpu:0, memory: 0, disk: 0}, total: Resource{cpu:0, memory: 0, disk: 0}}
+    };
+    RESOURCE.save(deps.storage, &total_resource)?;
 
     Ok(Response::default())
 }
