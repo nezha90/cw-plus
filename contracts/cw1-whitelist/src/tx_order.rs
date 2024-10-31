@@ -111,35 +111,7 @@ pub fn execute_extend(
     order_id: String,
     duration: u64,
 ) -> Result<Response, ContractError> {
-    // 加载订单
-    let order = ORDER_MAP.load(deps.storage, order_id.clone())?;
 
-    // 新的总金额
-    let price = order.resource.calc_price(duration)?;
-
-    // 需补充的
-    let shortage = price - order.locked_funds;
-
-    // 获取合约地址
-    let cw20 = CW20.load(deps.storage)?;
-
-    // 构建转账至合约的消息
-    // 合约收到对应金额后修改订单状态
-    let msg = to_json_binary(&ReceiveMsg::ExtendOrder { order_id: order_id.clone(), locked_funds: price, duration})?;
-
-    let wasm_msg = send(
-        cw20,
-        env.contract.address.to_string(),
-        Uint128::from(shortage),
-        msg,
-    )?;
-
-    Ok(Response::new()
-        .add_message(wasm_msg)
-        .add_attribute("action", "extend")
-        .add_attribute("order_id", order_id)
-        .add_attribute("shortage", Uint128::from(shortage))
-    )
 }
 
 

@@ -11,7 +11,7 @@ use crate::type_resource::{TotalResource, Resource};
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug)]
 pub enum ReceiveMsg {
     CreateOrder { order_id: String, initiator: String, resource: Resource, duration: u64},
-    ExtendOrder { order_id: String, locked_funds: u128, duration: u64 },
+    ExtendOrder { order_id: String, duration: u64 },
 }
 
 pub fn execute_receive(
@@ -31,7 +31,7 @@ pub fn execute_receive(
 
             create_order(deps, env,info, amount, order_id, initiator, resource, duration)
         }
-        ReceiveMsg::ExtendOrder { order_id, locked_funds, duration} => {
+        ReceiveMsg::ExtendOrder { order_id, duration} => {
             ORDER_MAP.update(deps.storage, order_id.clone(), |order: Option<Order>| {
                 let mut order = order.ok_or(ContractError::NotFound)?;
 
@@ -52,12 +52,18 @@ pub fn execute_receive(
                     return Err(ContractError::BadRequest {});
                 }
 
-                // 如果转账金额+已锁定金额不等于目标金额,则退出
-                if order.locked_funds + u128::from(amount) != locked_funds {
+                // 新的总金额
+                let price = order.resource.calc_price(duration)?;
+
+                // 需补充的
+                let shortage = price - order.locked_funds;
+
+                // 如果转账金额 不等于 目标金额,则退出
+                if u128::from(amount) != shortage {
                     return Err(ContractError::InsufficientFunds);
                 }
 
-                order.locked_funds = locked_funds;
+                order.locked_funds = price;
 
                 order.duration = duration;
 
