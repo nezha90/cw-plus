@@ -205,7 +205,6 @@ pub fn update_order(
 mod tests {
     use super::*;
     use crate::consts::HOUR;
-    use crate::msg::ExecuteMsg::Receive;
     use cosmwasm_std::to_json_binary;
 
     #[test]

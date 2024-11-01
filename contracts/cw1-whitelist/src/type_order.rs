@@ -2,7 +2,6 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::ContractError;
-use crate::consts::{HOUR};
 use crate::type_resource::Resource;
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug, Default)]
@@ -76,7 +75,7 @@ impl Order {
         self.status = OrderStatus::Expired;
 
         // 按实际使用时间扣费
-        let mut duration = if current_height < self.start_height + self.duration {
+        let duration = if current_height < self.start_height + self.duration {
             current_height - self.start_height
         } else {
             self.duration

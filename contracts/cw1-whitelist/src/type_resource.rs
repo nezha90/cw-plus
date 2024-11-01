@@ -3,7 +3,6 @@ use serde::{Serialize,Deserialize};
 
 use crate::ContractError;
 use crate::consts::{HOUR, CPU_UNIT_PRICE, MEM_UNIT_PRICE, DISK_UNIT_PRICE};
-use crate::msg::ExecuteMsg::Handle;
 
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug, Default)]
@@ -106,7 +105,7 @@ mod tests {
             (Resource{cpu:16, memory: 32, disk: 100}, 720 * HOUR, 2540160)];
 
         for (resource, duration, price) in resources {
-            let calc_price = resource.calc_price(duration)?;
+            let calc_price = resource.calc_price(duration).unwrap();
             assert_eq!(calc_price, price);
         }
     }

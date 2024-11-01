@@ -1,7 +1,7 @@
 use std::fmt;
 
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::{Binary, CosmosMsg, Empty, Uint128};
+use cosmwasm_std::{CosmosMsg, Empty, Uint128};
 use schemars::JsonSchema;
 use cw20::Cw20ReceiveMsg;
 
@@ -36,12 +36,15 @@ pub enum ExecuteMsg<T = Empty>
     //CreateOrder { order_id: String, resource: Resource, duration: u64 },
 
     //Release Order
+    // 结束订单
     ReleaseOrder { order_id: String },
 
     //Withdraw
+    // 提取资源提供方收益
     WithDraw {beneficiary: String, amount: Uint128},
 
     //Handle
+    // 手动终止订单并退还
     Handle {order_id: String},
 
     // Extend
@@ -50,6 +53,7 @@ pub enum ExecuteMsg<T = Empty>
     //Update {order_id: String, new_order_id: String, resource: Resource},
 
     // Set total resource
+    // 设置资源总量
     SetResource {resource: Resource},
 }
 
