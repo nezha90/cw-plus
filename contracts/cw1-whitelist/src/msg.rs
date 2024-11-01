@@ -5,7 +5,8 @@ use cosmwasm_std::{CosmosMsg, Empty, Uint128};
 use schemars::JsonSchema;
 use cw20::Cw20ReceiveMsg;
 
-use crate::type_resource::Resource;
+use crate::type_resource::{TotalResource, Resource};
+use crate::type_order::Order;
 
 #[cw_serde]
 pub struct InstantiateMsg {
@@ -54,7 +55,7 @@ pub enum ExecuteMsg<T = Empty>
 
     // Set total resource
     // 设置资源总量
-    SetResource {resource: Resource},
+    SetResource {cpu: u32, memory: u32, disk: u32},
 }
 
 #[cw_serde]
@@ -71,6 +72,12 @@ pub enum QueryMsg<T = Empty>
     /// before any further state changes, should also succeed.
     #[returns(cw1::CanExecuteResponse)]
     CanExecute { sender: String, msg: CosmosMsg<T> },
+
+    #[returns(Vec<Order>)]
+    Orders {order_ids: Vec<String>},
+
+    #[returns(TotalResource)]
+    Resources {},
 }
 
 #[cw_serde]

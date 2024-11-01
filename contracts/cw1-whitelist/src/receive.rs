@@ -11,9 +11,9 @@ use crate::msg::ExecuteMsg;
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug)]
 pub enum ReceiveMsg {
-    CreateOrder { order_id: String, resource: Resource, duration: u64},
+    CreateOrder { order_id: String, cpu: u32, memory: u32, disk: u32, duration: u64},
     ExtendOrder { order_id: String, duration: u64 },
-    UpdateOrder { order_id: String, new_order_id: String, resource: Resource, duration: u64},
+    UpdateOrder { order_id: String, new_order_id: String, cpu: u32, memory: u32, disk: u32, duration: u64},
 }
 
 pub fn execute_receive(
@@ -25,9 +25,20 @@ pub fn execute_receive(
     msg: Binary,
 ) -> Result<Response, ContractError> {
     match from_json(&msg)? {
-        ReceiveMsg::CreateOrder { order_id, resource, duration } => create_order(deps, env,info, sender, amount, order_id, resource, duration),
-        ReceiveMsg::ExtendOrder { order_id, duration} => extend_order(deps, env, info, sender, amount, order_id, duration),
-        ReceiveMsg::UpdateOrder { order_id, new_order_id, resource,duration} => update_order(deps, env, info, sender, amount, order_id, new_order_id, resource, duration),
+        ReceiveMsg::CreateOrder { order_id, cpu, memory, disk, duration } =>
+            {
+                let resource= Resource{cpu, memory, disk};
+                create_order(deps, env,info, sender, amount, order_id, resource, duration)
+            },
+        ReceiveMsg::ExtendOrder { order_id, duration} =>
+            {
+                extend_order(deps, env, info, sender, amount, order_id, duration)
+            },
+        ReceiveMsg::UpdateOrder { order_id, new_order_id, cpu, memory, disk,duration} =>
+            {
+                let resource= Resource{cpu, memory, disk};
+                update_order(deps, env, info, sender, amount, order_id, new_order_id, resource, duration)
+            },
     }
 }
 
@@ -221,8 +232,11 @@ mod tests {
 
         let msg = ReceiveMsg::CreateOrder {order_id, resource: resource.clone(), duration};
         let binary = to_json_binary(&msg).unwrap();
+
+
         println!("msg binary");
         println!("{}", binary);
+
         println!("price");
         let price = resource.calc_price(duration).unwrap();
         println!("{}", Uint128::from(price));

@@ -10,8 +10,12 @@ pub fn execute_set_resource(
     deps: DepsMut,
     _env: Env,
     info: MessageInfo,
-    resource: Resource,
+    cpu: u32,
+    memory: u32,
+    disk: u32,
 ) -> Result<Response, ContractError> {
+    let resource = Resource{cpu, memory, disk};
+
     // 仅管理员可设置
     let admin_list = ADMIN_LIST.load(deps.storage)?;
     if !admin_list.is_admin(info.sender.as_str()) {

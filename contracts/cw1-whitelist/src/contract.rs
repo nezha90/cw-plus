@@ -16,6 +16,8 @@ use crate::tx_order::{execute_release_order, execute_withdraw, execute_handle};
 use crate::tx_resource::execute_set_resource;
 use crate::consts::{CW20, LOCKED, EARNINGS, RESOURCE};
 use crate::type_resource::{Resource, TotalResource};
+use crate::query_order::query_orders;
+use crate::query_resource::query_resources;
 
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:cw1-whitelist";
@@ -79,7 +81,7 @@ pub fn execute(
         ExecuteMsg::WithDraw { beneficiary, amount } => execute_withdraw(deps, env, info, beneficiary, amount),
         ExecuteMsg::Handle {order_id} => execute_handle(deps, env, info, order_id),
 
-        ExecuteMsg::SetResource {resource} => execute_set_resource(deps,env,info,resource),
+        ExecuteMsg::SetResource { cpu, memory, disk } => execute_set_resource(deps, env, info, cpu, memory, disk),
     }
 }
 
@@ -149,6 +151,13 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
         QueryMsg::AdminList {} => to_json_binary(&query_admin_list(deps)?),
         QueryMsg::CanExecute { sender, msg } => {
             to_json_binary(&query_can_execute(deps, sender, msg)?)
+        }
+
+        QueryMsg::Orders { order_ids } => {
+            to_json_binary(&query_orders(deps, order_ids))
+        }
+        QueryMsg::Resources {} => {
+            to_json_binary(&query_resources(deps))
         }
     }
 }
