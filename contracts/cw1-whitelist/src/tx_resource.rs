@@ -25,6 +25,8 @@ pub fn execute_set_resource(
     let mut total_resource = RESOURCE.load(deps.storage)?;
     total_resource.set_total(resource)?;
 
+    RESOURCE.save(deps.storage, &total_resource)?;
+
     Ok(Response::new()
         .add_attribute("action", "set_resource")
     )
