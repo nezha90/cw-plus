@@ -220,24 +220,23 @@ mod tests {
 
     #[test]
     fn get_receive_msg() {
-        let resource = Resource{
-            cpu: 4,
-            memory: 4,
-            disk: 50,
-        };
+        let cpu = 4;
+        let memory= 4;
+        let disk = 50;
+
+        let resource = Resource{cpu, memory, disk};
 
         let duration = HOUR * 12;
 
         let order_id = "1".to_string();
 
-        let msg = ReceiveMsg::CreateOrder {order_id, resource: resource.clone(), duration};
-        let binary = to_json_binary(&msg).unwrap();
-
-
-        println!("msg binary");
-        println!("{}", binary);
+        //let msg = ReceiveMsg::CreateOrder {order_id, cpu, memory, disk, duration};
 
         println!("price");
+        let price = resource.calc_price(duration).unwrap();
+        println!("{}", Uint128::from(price));
+
+        let duration = HOUR * 12;
         let price = resource.calc_price(duration).unwrap();
         println!("{}", Uint128::from(price));
     }
