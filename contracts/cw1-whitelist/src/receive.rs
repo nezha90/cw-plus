@@ -161,6 +161,8 @@ fn extend_order(
     // 增加总锁定金额
     money_action(deps.storage, MoneyAction::AddLocked, amount)?;
 
+    ORDER_MAP.save(deps.storage, order_id, &order)?;
+
     Ok(Response::new()
         .add_attribute("action", "receive")
         .add_attribute("internal", "extend")
