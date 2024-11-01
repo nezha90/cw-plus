@@ -236,7 +236,7 @@ mod tests {
         let price = resource.calc_price(duration).unwrap();
         println!("{}", Uint128::from(price));
 
-        let duration = HOUR * 12;
+        let duration = HOUR * 24;
         let price = resource.calc_price(duration).unwrap();
         println!("{}", Uint128::from(price));
     }
