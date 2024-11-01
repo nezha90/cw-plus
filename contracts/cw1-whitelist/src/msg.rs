@@ -78,6 +78,12 @@ pub enum QueryMsg<T = Empty>
 
     #[returns(TotalResource)]
     Resources {},
+
+    #[returns(Uint128)]
+    Locked,
+
+    #[returns(Uint128)]
+    Earnings,
 }
 
 #[cw_serde]

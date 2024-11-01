@@ -18,6 +18,7 @@ use crate::consts::{CW20, LOCKED, EARNINGS, RESOURCE};
 use crate::type_resource::{Resource, TotalResource};
 use crate::query_order::query_orders;
 use crate::query_resource::query_resources;
+use crate::query_fund::{query_locked, query_earnings};
 
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:cw1-whitelist";
@@ -158,6 +159,12 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
         }
         QueryMsg::Resources {} => {
             to_json_binary(&query_resources(deps)?)
+        }
+        QueryMsg::Locked => {
+            to_json_binary(&query_locked(deps)?)
+        }
+        QueryMsg::Earnings => {
+            to_json_binary(&query_earnings(deps)?)
         }
     }
 }

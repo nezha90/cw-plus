@@ -35,4 +35,5 @@ pub mod consts;
 pub mod tx_resource;
 pub mod query_order;
 pub mod query_resource;
+pub mod query_fund;
 
