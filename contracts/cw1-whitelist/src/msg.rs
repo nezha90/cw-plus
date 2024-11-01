@@ -3,6 +3,8 @@ use std::fmt;
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::{Binary, CosmosMsg, Empty, Uint128};
 use schemars::JsonSchema;
+use cw20::Cw20ReceiveMsg;
+
 use crate::type_resource::Resource;
 
 #[cw_serde]
@@ -29,8 +31,7 @@ pub enum ExecuteMsg<T = Empty>
     UpdateAdmins { admins: Vec<String> },
 
     /// cw20
-    Receive { sender: String, amount: Uint128, msg: Binary },
-
+    Receive(Cw20ReceiveMsg),
     ///Create Order
     //CreateOrder { order_id: String, resource: Resource, duration: u64 },
 

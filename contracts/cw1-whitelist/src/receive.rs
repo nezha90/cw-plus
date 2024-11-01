@@ -197,4 +197,36 @@ pub fn update_order(
         .add_message(release_msg)
         .add_attribute("action", "receive")
         .add_attribute("internal", "update_order")
-    )}
+    )
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::consts::HOUR;
+    use crate::msg::ExecuteMsg::Receive;
+    use cosmwasm_std::to_json_binary;
+    use fmt;
+
+    #[test]
+    fn get_receive_msg() {
+        let resource = Resource{
+            cpu: 4,
+            memory: 4,
+            disk: 100,
+        };
+
+        let duration = HOUR * 12;
+
+        let order_id = "1".to_string();
+
+        let msg = ReceiveMsg::CreateOrder {order_id, resource, duration};
+        let binary = to_json_binary(&msg)?;
+        println!("msg binary");
+        println!(binary);
+        println!("price");
+        let price = resource.calc_price(duration)?;
+        println!(Uint128::from(price));
+    }
+}
