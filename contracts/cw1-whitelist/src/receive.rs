@@ -167,7 +167,7 @@ pub fn update_order(
     resource: Resource,
     duration: u64,
 ) -> Result<Response, ContractError>{
-    let mut order = ORDER_MAP.load(deps.storage, order_id.clone())?;
+    let order = ORDER_MAP.load(deps.storage, order_id.clone())?;
 
     // 仅订单所有者可以升级订单
     if !order.is_initiator(sender.clone()) {
