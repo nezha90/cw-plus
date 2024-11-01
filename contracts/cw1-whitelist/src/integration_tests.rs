@@ -52,8 +52,7 @@ impl Suite {
             .instantiate_contract(
                 self.cw1_id,
                 Addr::unchecked(self.owner.clone()),
-                &InstantiateMsg { admins, mutable },
-                &[],
+                &InstantiateMsg { admins, mutable, cw20_contract: "".to_string(), resource: None },                &[],
                 "Whitelist",
                 None,
             )

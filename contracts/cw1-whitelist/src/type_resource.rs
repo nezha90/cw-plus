@@ -3,6 +3,7 @@ use serde::{Serialize,Deserialize};
 
 use crate::ContractError;
 use crate::consts::{HOUR, CPU_UNIT_PRICE, MEM_UNIT_PRICE, DISK_UNIT_PRICE};
+use crate::msg::ExecuteMsg::Handle;
 
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug, Default)]
@@ -24,8 +25,15 @@ impl Resource {
     pub fn calc_price(&self, duration: u64) -> Result<u128, ContractError> {
         let uint_price = self.calc_cpu_price()? + self.calc_mem_price()? + self.calc_disk_price()?;
 
+        let mut hour = duration / HOUR;
+        // 不足一小时则按一小时算
+        if duration % HOUR != 0 {
+            hour += 1;
+        }
+
         let duration_coefficient = Resource::calc_duration_coefficient(duration)?;
-        return Ok(uint_price * u128::from(duration) * duration_coefficient / 10)
+
+        return Ok(uint_price * u128::from(hour) * duration_coefficient / 10)
     }
 
     pub fn check(&self) -> bool {
@@ -92,7 +100,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn calc_price() {
+    fn calc_price_test() {
         let resources: Vec<_> = vec![
             (Resource{cpu:4, memory: 4, disk: 50}, 12 * HOUR, 10800),
             (Resource{cpu:16, memory: 32, disk: 100}, 720 * HOUR, 2540160)];

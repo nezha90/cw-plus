@@ -82,11 +82,6 @@ impl Order {
             self.duration
         };
 
-        // 不足一小时则按一小时计算
-        if duration % HOUR != 0 {
-            duration = ((duration / HOUR) + 1) * HOUR;
-        }
-
         let price = self.resource.calc_price(duration)?;
 
         Ok(price)

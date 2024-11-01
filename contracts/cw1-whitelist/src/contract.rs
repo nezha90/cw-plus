@@ -192,6 +192,8 @@ mod tests {
         let instantiate_msg = InstantiateMsg {
             admins: vec![alice.to_string(), bob.to_string(), carl.to_string()],
             mutable: true,
+            cw20_contract: "".to_string(),
+            resource: None,
         };
         let info = mock_info(anyone, &[]);
         instantiate(deps.as_mut(), mock_env(), info, instantiate_msg).unwrap();
@@ -260,6 +262,8 @@ mod tests {
         let instantiate_msg = InstantiateMsg {
             admins: vec![alice, carl.to_string()],
             mutable: false,
+            cw20_contract: "".to_string(),
+            resource: None,
         };
         let info = mock_info(&bob, &[]);
         instantiate(deps.as_mut(), mock_env(), info, instantiate_msg).unwrap();
@@ -310,6 +314,8 @@ mod tests {
         let instantiate_msg = InstantiateMsg {
             admins: vec![alice.to_string(), bob.to_string()],
             mutable: false,
+            cw20_contract: "".to_string(),
+            resource: None,
         };
         let info = mock_info(anyone, &[]);
         instantiate(deps.as_mut(), mock_env(), info, instantiate_msg).unwrap();

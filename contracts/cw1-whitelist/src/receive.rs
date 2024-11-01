@@ -207,7 +207,6 @@ mod tests {
     use crate::consts::HOUR;
     use crate::msg::ExecuteMsg::Receive;
     use cosmwasm_std::to_json_binary;
-    use fmt;
 
     #[test]
     fn get_receive_msg() {
@@ -221,12 +220,12 @@ mod tests {
 
         let order_id = "1".to_string();
 
-        let msg = ReceiveMsg::CreateOrder {order_id, resource, duration};
-        let binary = to_json_binary(&msg)?;
+        let msg = ReceiveMsg::CreateOrder {order_id, resource: resource.clone(), duration};
+        let binary = to_json_binary(&msg).unwrap();
         println!("msg binary");
-        println!(binary);
+        println!("{}", binary);
         println!("price");
-        let price = resource.calc_price(duration)?;
-        println!(Uint128::from(price));
+        let price = resource.calc_price(duration).unwrap();
+        println!("{}", Uint128::from(price));
     }
 }
