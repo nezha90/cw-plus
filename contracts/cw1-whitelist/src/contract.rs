@@ -154,10 +154,10 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
         }
 
         QueryMsg::Orders { order_ids } => {
-            to_json_binary(&query_orders(deps, order_ids))
+            to_json_binary(&query_orders(deps, order_ids)?)
         }
         QueryMsg::Resources {} => {
-            to_json_binary(&query_resources(deps))
+            to_json_binary(&query_resources(deps)?)
         }
     }
 }
