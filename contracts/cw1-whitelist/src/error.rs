@@ -23,4 +23,7 @@ pub enum ContractError {
 
     #[error("Insufficient Capacity")]
     InsufficientCapacity,
+
+    #[error("Shortened Duration")]
+    ShortenedDuration,
 }

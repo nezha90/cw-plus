@@ -1,4 +1,4 @@
-use cosmwasm_std::{Binary, DepsMut, Env, from_json, MessageInfo, Response, Uint128};
+use cosmwasm_std::{Binary, DepsMut, Env, from_json, MessageInfo, Response, Uint128, wasm_execute, Empty};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -7,12 +7,13 @@ use crate::ContractError;
 use crate::type_order::{Order, OrderStatus};
 use crate::common::{money_action, MoneyAction};
 use crate::type_resource::{TotalResource, Resource};
+use crate::msg::ExecuteMsg;
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, JsonSchema, Debug)]
 pub enum ReceiveMsg {
     CreateOrder { order_id: String, resource: Resource, duration: u64},
     ExtendOrder { order_id: String, duration: u64 },
-    UpdateOrder { order_id: String, new_order_id: String, resource: Resource},
+    UpdateOrder { order_id: String, new_order_id: String, resource: Resource, duration: u64},
 }
 
 pub fn execute_receive(
@@ -24,25 +25,22 @@ pub fn execute_receive(
     msg: Binary,
 ) -> Result<Response, ContractError> {
     match from_json(&msg)? {
-        ReceiveMsg::CreateOrder { order_id, resource, duration } => {
-            create_order(deps, env,info, amount, order_id, sender, resource, duration)
-        }
-        ReceiveMsg::ExtendOrder { order_id, duration} => {
-            extend_order(deps, env, info, sender, amount, order_id, duration)
-        }
+        ReceiveMsg::CreateOrder { order_id, resource, duration } => create_order(deps, env,info, sender, amount, order_id, resource, duration),
+        ReceiveMsg::ExtendOrder { order_id, duration} => extend_order(deps, env, info, sender, amount, order_id, duration),
+        ReceiveMsg::UpdateOrder { order_id, new_order_id, resource,duration} => update_order(deps, env, info, sender, amount, order_id, new_order_id, resource, duration),
     }
 }
 
-pub fn create_order(
+pub fn create_order_inner(
     deps: DepsMut,
     env: Env,
     _info: MessageInfo,
+    sender: String,
     amount: Uint128,
     order_id: String,
-    initiator: String,
     resource: Resource,
     duration: u64,
-) -> Result<Response, ContractError> {
+) -> Result<(), ContractError> {
     //确认 Order id 唯一
     if ORDER_MAP.may_load(deps.storage, order_id.clone())?.is_some() {
         return Err(ContractError::AlreadyExists {});
@@ -71,9 +69,14 @@ pub fn create_order(
         env.block.height,
         duration,
         total_cost,
-        initiator.clone(),
+        sender.clone(),
         resource,
     );
+
+    ORDER_MAP.save(deps.storage, order_id.clone(), &order)?;
+
+    // 增加总锁定金额数量
+    money_action(deps.storage,MoneyAction::AddLocked, amount)?;
 
     // 增加对应的总资源使用量
     RESOURCE.update(deps.storage, |mut total_resource| {
@@ -82,17 +85,25 @@ pub fn create_order(
         Ok::<TotalResource, ContractError>(total_resource)
     })?;
 
-    ORDER_MAP.save(deps.storage, order_id.clone(), &order)?;
+    Ok(())
+}
 
-    // 增加总锁定金额数量
-    money_action(deps.storage,MoneyAction::AddLocked, amount)?;
+pub fn create_order(
+    deps: DepsMut,
+    env: Env,
+    info: MessageInfo,
+    sender: String,
+    amount: Uint128,
+    order_id: String,
+    resource: Resource,
+    duration: u64,
+) -> Result<Response, ContractError> {
+    create_order_inner(deps, env, info, sender, amount, order_id, resource, duration)?;
 
     Ok(Response::new()
         .add_attribute("action", "receive")
         .add_attribute("internal", "create_order")
-        .add_attribute("sender", initiator)
-        .add_attribute("amount", amount)
-        .add_attribute("order_id", order_id))
+    )
 }
 
 fn extend_order(
@@ -136,14 +147,54 @@ fn extend_order(
 
     order.duration = duration;
 
-
-
     // 增加总锁定金额
     money_action(deps.storage, MoneyAction::AddLocked, amount)?;
 
     Ok(Response::new()
         .add_attribute("action", "receive")
         .add_attribute("internal", "extend")
-        .add_attribute("order_id", order_id))
-
+    )
 }
+
+pub fn update_order(
+    deps: DepsMut,
+    env: Env,
+    info: MessageInfo,
+    sender: String,
+    amount: Uint128,
+    order_id: String,
+    new_order_id: String,
+    resource: Resource,
+    duration: u64,
+) -> Result<Response, ContractError>{
+    let mut order = ORDER_MAP.load(deps.storage, order_id.clone())?;
+
+    // 仅订单所有者可以升级订单
+    if !order.is_initiator(sender.clone()) {
+        return Err(ContractError::Unauthorized {})
+    }
+
+    // 新订单结束时间不能小于当前订单
+    if env.block.height + duration < order.start_height + order.duration {
+        return Err(ContractError::ShortenedDuration {})
+    }
+
+    // 至少一项资源大于现有,且所有资源不能小于之前
+    if !resource.is_greater_than(&order.resource) {
+        return Err(ContractError::BadRequest {})
+    }
+
+    // 释放旧订单消息
+    let release_msg = wasm_execute(
+        env.contract.address.clone(),
+        &ExecuteMsg::<Empty>::ReleaseOrder {order_id: order_id.clone()},
+        Vec::new(),
+    )?;
+
+    create_order_inner(deps, env, info, sender, amount, new_order_id, resource, duration)?;
+
+    Ok(Response::new()
+        .add_message(release_msg)
+        .add_attribute("action", "receive")
+        .add_attribute("internal", "update_order")
+    )}

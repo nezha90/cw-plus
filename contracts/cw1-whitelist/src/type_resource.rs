@@ -16,6 +16,11 @@ pub struct Resource {
 }
 
 impl Resource {
+    pub fn is_greater_than(&self, other: &Resource) -> bool {
+        (self.cpu > other.cpu || self.memory > other.memory || self.disk > other.disk)
+            && (self.cpu >= other.cpu && self.memory >= other.memory && self.disk >= other.disk)
+    }
+
     pub fn calc_price(&self, duration: u64) -> Result<u128, ContractError> {
         let uint_price = self.calc_cpu_price()? + self.calc_mem_price()? + self.calc_disk_price()?;
 
@@ -25,7 +30,7 @@ impl Resource {
 
     pub fn check(&self) -> bool {
          !(self.cpu < 1 || self.cpu > 32 ||
-            self.disk < 1 || self.memory > 64 ||
+            self.memory < 1 || self.memory > 64 ||
             self.disk < 40 || self.disk > 4000)
     }
 

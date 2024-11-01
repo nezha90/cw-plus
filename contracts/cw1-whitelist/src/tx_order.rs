@@ -20,16 +20,18 @@ pub fn execute_release_order(
     // 加载订单
     let mut order = ORDER_MAP.load(deps.storage, order_id.clone())?;
 
-    // 仅管理员和使用者可以结束订单
-    if !admin_list.is_admin(info.sender.as_str()) && !order.is_initiator(info.sender.to_string()){
+    // 仅管理员/使用者/本合约可以结束订单
+    if !admin_list.is_admin(info.sender.as_str())
+        && !order.is_initiator(info.sender.to_string())
+        && info.sender != env.contract.address {
         return Err(ContractError::Unauthorized {});
     }
 
-    // 得到总金额
-    let locked_funds = order.locked_funds;
-
     // 计算实际消费并修改订单状态
     let price = order.release(env.block.height)?;
+
+    // 得到总金额
+    let locked_funds = order.locked_funds;
 
     // 退还余额
     let overage = locked_funds - price;
