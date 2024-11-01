@@ -72,7 +72,7 @@ pub fn execute(
         ExecuteMsg::Freeze {} => execute_freeze(deps, env, info),
         ExecuteMsg::UpdateAdmins { admins } => execute_update_admins(deps, env, info, admins),
 
-        ExecuteMsg::Receive { sender, amount, msg } => execute_receive(deps, env, info, sender, amount, msg),
+        ExecuteMsg::Receive(receive) => execute_receive(deps, env, info, receive.sender, receive.amount, receive.msg),
 
         ExecuteMsg::ReleaseOrder { order_id } => execute_release_order(deps, env, info, order_id),
 
