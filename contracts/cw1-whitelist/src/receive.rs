@@ -212,7 +212,7 @@ mod tests {
         let resource = Resource{
             cpu: 4,
             memory: 4,
-            disk: 100,
+            disk: 50,
         };
 
         let duration = HOUR * 12;
