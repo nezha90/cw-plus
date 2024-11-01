@@ -137,7 +137,7 @@ fn extend_order(
     // 3. 续期时长大于最大时长
     // 4. 续期时长小于等于当前时长
     if order.status != OrderStatus::Active||
-        order.start_height + order.duration > env.block.height ||
+        order.start_height + order.duration < env.block.height ||
         duration > ORDER_MAX_DURATION ||
         duration <= order.duration {
         return Err(ContractError::BadRequest {});
