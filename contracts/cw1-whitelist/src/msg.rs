@@ -42,7 +42,7 @@ pub enum ExecuteMsg<T = Empty>
 
     //Withdraw
     // 提取资源提供方收益
-    WithDraw {beneficiary: String, amount: Uint128},
+    Withdraw {beneficiary: String, amount: Uint128},
 
     //Handle
     // 手动终止订单并退还

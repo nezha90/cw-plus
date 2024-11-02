@@ -79,7 +79,7 @@ pub fn execute(
 
         ExecuteMsg::ReleaseOrder { order_id } => execute_release_order(deps, env, info, order_id),
 
-        ExecuteMsg::WithDraw { beneficiary, amount } => execute_withdraw(deps, env, info, beneficiary, amount),
+        ExecuteMsg::Withdraw { beneficiary, amount } => execute_withdraw(deps, env, info, beneficiary, amount),
         ExecuteMsg::Handle {order_id} => execute_handle(deps, env, info, order_id),
 
         ExecuteMsg::SetResource { cpu, memory, disk } => execute_set_resource(deps, env, info, cpu, memory, disk),
