@@ -79,7 +79,7 @@ impl Resource {
 
     // 计算乘 10 后的时间系数,使用时需要除 10
     pub fn calc_duration_coefficient(duration: u64) -> Result<u128, ContractError> {
-        if duration > HOUR && duration <= HOUR * 24 {
+        if duration <= HOUR * 24 {
             return Ok(10)
         } else if duration <= HOUR * 72 {
             return Ok(9)
