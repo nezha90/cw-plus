@@ -148,7 +148,7 @@ fn extend_order(
 
     // 需补充的
     let shortage = price - order.locked_funds;
-`
+
     // 如果转账金额 不等于 目标金额,则退出
     if u128::from(amount) != shortage {
         return Err(ContractError::InsufficientFunds{received: amount, expected: Uint128::from(shortage)});
