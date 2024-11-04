@@ -3,7 +3,7 @@ use std::fmt;
 use cosmwasm_std::{Addr, Api, Binary, CosmosMsg, Deps, DepsMut, Empty, Env, MessageInfo, Response, StdResult, to_json_binary, Uint128};
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cw2::set_contract_version;
+use cw2::{set_contract_version, get_contract_version};
 use schemars::JsonSchema;
 
 use cw1::CanExecuteResponse;
@@ -185,6 +185,22 @@ pub fn query_can_execute(
     Ok(CanExecuteResponse {
         can_execute: can_execute(deps, &sender)?,
     })
+}
+
+// Migrate contract if version is lower than current version
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn migrate(deps: DepsMut, _env: Env, _msg: Empty) -> Result<Response, ContractError> {
+    let version: Version = CONTRACT_VERSION.parse()?;
+    let storage_version: Version = get_contract_version(deps.storage)?.version.parse()?;
+
+    if storage_version < version {
+        set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
+
+        // If state structure changed in any contract version in the way migration is needed, it
+        // should occur here
+    }
+
+    Ok(Response::new())
 }
 
 #[cfg(test)]
