@@ -80,10 +80,10 @@ pub enum QueryMsg<T = Empty>
     Resources {},
 
     #[returns(Uint128)]
-    Locked,
+    Locked{},
 
     #[returns(Uint128)]
-    Earnings,
+    Earnings{},
 }
 
 #[cw_serde]

@@ -161,10 +161,10 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
         QueryMsg::Resources {} => {
             to_json_binary(&query_resources(deps)?)
         }
-        QueryMsg::Locked => {
+        QueryMsg::Locked {} => {
             to_json_binary(&query_locked(deps)?)
         }
-        QueryMsg::Earnings => {
+        QueryMsg::Earnings {}=> {
             to_json_binary(&query_earnings(deps)?)
         }
     }
