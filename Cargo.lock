@@ -318,6 +318,7 @@ dependencies = [
  "cw20",
  "derivative",
  "schemars",
+ "semver",
  "serde",
  "thiserror",
 ]

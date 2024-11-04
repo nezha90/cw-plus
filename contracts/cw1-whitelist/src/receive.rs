@@ -71,7 +71,7 @@ pub fn create_order_inner(
     let total_cost = resource.calc_price(duration)?;
 
     if total_cost != u128::from(amount) {
-        return Err(ContractError::InsufficientFunds);
+        return Err(ContractError::InsufficientFunds{received: amount, expected: Uint128::from(total_cost)});
     }
 
     // 创建订单
@@ -148,10 +148,10 @@ fn extend_order(
 
     // 需补充的
     let shortage = price - order.locked_funds;
-
+`
     // 如果转账金额 不等于 目标金额,则退出
     if u128::from(amount) != shortage {
-        return Err(ContractError::InsufficientFunds);
+        return Err(ContractError::InsufficientFunds{received: amount, expected: Uint128::from(shortage)});
     }
 
     order.locked_funds = price;

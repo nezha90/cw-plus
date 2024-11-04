@@ -40,7 +40,7 @@ pub fn money_action(storage: &mut dyn Storage,action: MoneyAction, amount: Uint1
             let mut locked = LOCKED.load(storage)?;
 
             if locked < amount {
-                return Err(ContractError::InsufficientFunds)
+                return Err(ContractError::InsufficientFunds{received: locked, expected: amount})
             }
             locked -= amount;
 
@@ -57,7 +57,7 @@ pub fn money_action(storage: &mut dyn Storage,action: MoneyAction, amount: Uint1
             let mut earnings = EARNINGS.load(storage)?;
 
             if earnings < amount {
-                return Err(ContractError::InsufficientFunds)
+                return Err(ContractError::InsufficientFunds{received: earnings, expected: amount})
             }
 
             earnings -= amount;

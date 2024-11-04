@@ -1,4 +1,4 @@
-use cosmwasm_std::StdError;
+use cosmwasm_std::{StdError, Uint128};
 use thiserror::Error;
 
 #[derive(Error, Debug, PartialEq)]
@@ -10,7 +10,7 @@ pub enum ContractError {
     Unauthorized {},
 
     #[error("Insufficient funds")]
-    InsufficientFunds,
+    InsufficientFunds{received: Uint128, expected: Uint128},
 
     #[error("Bad request")]
     BadRequest,
@@ -26,4 +26,15 @@ pub enum ContractError {
 
     #[error("Shortened Duration")]
     ShortenedDuration,
+
+    #[error("Semver parsing error: {0}")]
+    SemVer(String),
 }
+
+
+impl From<semver::Error> for ContractError {
+    fn from(err: semver::Error) -> Self {
+        Self::SemVer(err.to_string())
+    }
+}
+
