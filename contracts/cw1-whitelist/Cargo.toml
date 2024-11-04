@@ -28,6 +28,7 @@ schemars = { workspace = true }
 serde = { workspace = true }
 thiserror = { workspace = true }
 cw20 = { workspace = true }
+semver = { workspace = true }
 
 [dev-dependencies]
 anyhow = "1"

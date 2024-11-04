@@ -7,6 +7,7 @@ use cw2::{set_contract_version, get_contract_version};
 use schemars::JsonSchema;
 
 use cw1::CanExecuteResponse;
+use semver::Version;
 
 use crate::error::ContractError;
 use crate::msg::{AdminListResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
