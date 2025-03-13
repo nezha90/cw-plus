@@ -1,0 +1,93 @@
+use cosmwasm_std::{DepsMut, Env, MessageInfo, Response, Uint128, StdError, BankMsg, Coin};
+
+use crate::types::CONTRACT_STATE;
+use crate::consts::{DENOM, END_TIME};
+use crate::ContractError;
+use crate::state::ADMIN_LIST;
+
+pub fn fund_rewards(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+) -> Result<Response, ContractError>  {
+    // 获取转账金额
+    let amount = info.funds
+        .iter()
+        .find(|c| c.denom == DENOM)
+        .map(|c| c.amount)
+        .unwrap_or_else(Uint128::zero);
+
+    if amount.is_zero() {
+        return Err(ContractError::Std(StdError::generic_err("No funds sent")))
+    }
+
+    // 更新全局状态中的可发放收益
+    let mut state = CONTRACT_STATE.load(deps.storage)?;
+    state.available_rewards += amount;
+    CONTRACT_STATE.save(deps.storage, &state)?;
+
+    // 返回成功响应
+    Ok(Response::new()
+        .add_attribute("action", "fund_rewards")
+        .add_attribute("amount", amount))
+}
+
+pub fn update_end_time(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    new_end_time: u64,
+) -> Result<Response, ContractError> {
+    // 仅管理员可设置
+    let admin_list = ADMIN_LIST.load(deps.storage)?;
+    if !admin_list.is_admin(info.sender.as_str()) {
+        return Err(ContractError::Unauthorized {});
+    }
+
+    // 更新结束日期
+    END_TIME.save(deps.storage, &new_end_time)?;
+
+    // 返回成功响应
+    Ok(Response::new()
+        .add_attribute("action", "update_end_time")
+        .add_attribute("new_end_time", new_end_time.to_string()))
+}
+
+pub fn extract_fund(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    amount: Uint128,
+) -> Result<Response, ContractError> {
+    // 仅管理员可设置
+    let admin_list = ADMIN_LIST.load(deps.storage)?;
+    if !admin_list.is_admin(info.sender.as_str()) {
+        return Err(ContractError::Unauthorized {});
+    }
+
+    if amount.is_zero() {
+        return Err(ContractError::Std(StdError::generic_err("Funding abnormality")))
+    }
+
+    // 更新全局状态中的可发放收益
+    let mut state = CONTRACT_STATE.load(deps.storage)?;
+
+    if amount > state.available_rewards {
+        return Err(ContractError::Std(StdError::generic_err("Insufficient staked amount")))
+    }
+
+    state.available_rewards -= amount;
+    CONTRACT_STATE.save(deps.storage, &state)?;
+
+    // 返回成功响应
+    Ok(Response::new()
+        .add_message(BankMsg::Send {
+            to_address: info.sender.to_string(),
+            amount: vec![Coin {
+                denom: DENOM.to_string(),
+                amount,
+            }],
+        })
+        .add_attribute("action", "extract_fund")
+        .add_attribute("amount", amount))
+}
