@@ -114,6 +114,8 @@ impl AdminListResponse {
 #[cw_serde]
 pub struct ContractStateResponse {
     pub contract_state: ContractState,
+    pub start_time: u64,
+    pub end_time: u64,
 }
 
 #[cw_serde]
