@@ -16,6 +16,7 @@ pub struct StakingInfo {
 
     pub principal: Uint128,          // 质押的本金
     pub pending_reward: Uint128,     // 待领取的收益
+    pub reward: Uint128,             // 已领取的收益
 
     pub last_update_time: u64,       // 上次收益更新时间（s）
     pub start_time: u64,             // 质押开始时间（s）

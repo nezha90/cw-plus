@@ -28,4 +28,3 @@ pub fn query_contract_state(deps: Deps) -> StdResult<ContractStateResponse> {
 
     Ok(ContractStateResponse{contract_state, start_time, end_time})
 }
-

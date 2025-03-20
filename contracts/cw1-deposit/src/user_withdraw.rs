@@ -76,12 +76,14 @@ pub fn claim_rewards(
     let reward_amount = staking_info.pending_reward;
     state.available_rewards -= reward_amount;
 
+    //设置已经领取的奖励
+    staking_info.reward += staking_info.pending_reward;
+
     // 重置用户的待领取收益
     staking_info.pending_reward = Uint128::zero();
 
     // 更新已经领取的收益
     state.total_rewards += reward_amount;
-
 
     // 保存更新后的数据
     STAKING_INFO.save(deps.storage, &user, &staking_info)?;

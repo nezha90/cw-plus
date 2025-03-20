@@ -34,6 +34,7 @@ pub fn stake(
         user: user.clone(),
         principal: Uint128::zero(),
         pending_reward: Uint128::zero(),
+        reward: Uint128::zero(),
         last_update_time: env.block.time.seconds(),
         start_time: env.block.time.seconds(),
         unstake_requests: vec![],
