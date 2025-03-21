@@ -3,6 +3,7 @@ use cosmwasm_std::{DepsMut, Env, MessageInfo, Response, Uint128, StdError};
 use crate::types::{STAKING_INFO, CONTRACT_STATE, UnstakeRequest};
 use crate::rewards::update_rewards;
 use crate::ContractError;
+use crate::consts::PENDING_TIME;
 
 // 解押函数
 pub fn un_stake(
@@ -37,7 +38,7 @@ pub fn un_stake(
     STAKING_INFO.save(deps.storage, &user, &staking_info)?;
 
     // 添加解押请求
-    let unlock_time = env.block.time.seconds() + 7 * 86400; // 7 天后解锁
+    let unlock_time = env.block.time.seconds() + PENDING_TIME; // 5 天后解锁
     staking_info.unstake_requests.push(UnstakeRequest {
         amount,
         unlock_time,

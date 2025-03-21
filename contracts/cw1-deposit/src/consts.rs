@@ -13,3 +13,5 @@ pub const DENOM: &str = "uttnt";
 pub const HOUR: u64 = 60 * 60;
 pub const DAY: u64 = HOUR * 24;
 pub const YEAR: u64 = DAY * 365;
+
+pub const PENDING_TIME: u64 = DAY * 5;
