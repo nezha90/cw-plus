@@ -38,7 +38,7 @@ pub fn un_stake(
     STAKING_INFO.save(deps.storage, &user, &staking_info)?;
 
     // 添加解押请求
-    let unlock_time = env.block.time.seconds() + PENDING_TIME; // 5 天后解锁
+    let unlock_time = env.block.time.seconds() + PENDING_TIME;
     staking_info.unstake_requests.push(UnstakeRequest {
         amount,
         unlock_time,

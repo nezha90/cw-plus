@@ -24,6 +24,7 @@ pub fn fund_rewards(
     // 更新全局状态中的可发放收益
     let mut state = CONTRACT_STATE.load(deps.storage)?;
     state.available_rewards += amount;
+
     CONTRACT_STATE.save(deps.storage, &state)?;
 
     // 返回成功响应
