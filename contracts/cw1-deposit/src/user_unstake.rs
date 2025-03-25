@@ -17,14 +17,8 @@ pub fn un_stake(
     // 加载用户质押信息
     let mut staking_info = STAKING_INFO.load(deps.storage, &user)?;
 
-    // 计算已解押但未领取的金额
-    let total_unstaked_amount: Uint128 = staking_info.unstake_requests
-        .iter()
-        .map(|request| request.amount)
-        .sum();
-
     // 确保用户的质押本金足够
-    if staking_info.principal < total_unstaked_amount + amount {
+    if staking_info.principal < amount {
         return Err(ContractError::Std(StdError::generic_err("Insufficient staked amount")));
     }
 
