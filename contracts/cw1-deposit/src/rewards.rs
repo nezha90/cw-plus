@@ -74,6 +74,7 @@ mod tests {
             user: Addr::unchecked("user"),
             principal: Uint128::from(principal),
             pending_reward: Uint128::zero(),
+            reward: Uint128::zero(),
             last_update_time,
             start_time: 0,
             remainder,
