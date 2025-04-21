@@ -28,9 +28,6 @@ pub fn un_stake(
     // 更新用户的质押本金
     staking_info.principal -= amount;
 
-    // 保存用户质押信息
-    STAKING_INFO.save(deps.storage, &user, &staking_info)?;
-
     // 添加解押请求
     let unlock_time = env.block.time.seconds() + PENDING_TIME;
     staking_info.unstake_requests.push(UnstakeRequest {
