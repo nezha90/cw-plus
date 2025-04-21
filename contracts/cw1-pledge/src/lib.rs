@@ -24,5 +24,10 @@ pub mod error;
 mod integration_tests;
 pub mod msg;
 pub mod state;
+mod node_types;
+mod reousrce_types;
+mod pledge;
+mod consts;
+mod un_pledge;
 
 pub use crate::error::ContractError;

@@ -3,7 +3,7 @@ use schemars::JsonSchema;
 use std::fmt;
 
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::{CosmosMsg, Empty};
+use cosmwasm_std::{CosmosMsg, Empty, Uint128, Addr};
 
 #[cw_serde]
 pub struct InstantiateMsg {
@@ -80,4 +80,10 @@ impl AdminListResponse {
         self.admins.dedup();
         self
     }
+}
+
+
+#[cw_serde]
+pub struct PledgeResponse {
+    pub pledge: Uint128,
 }
