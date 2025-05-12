@@ -4,6 +4,8 @@ use std::fmt;
 
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::{CosmosMsg, Empty, Uint128, Addr};
+use crate::status::pledge::PledgeOption;
+use crate::status::types::ContractState;
 
 #[cw_serde]
 pub struct InstantiateMsg {
@@ -86,4 +88,14 @@ impl AdminListResponse {
 #[cw_serde]
 pub struct PledgeResponse {
     pub pledge: Uint128,
+}
+
+#[cw_serde]
+pub struct PledgeRuleResponse {
+    pub pledge_rule: Vec<PledgeOption>,
+}
+
+#[cw_serde]
+pub struct ContractStateResponse {
+    pub contract_state: ContractState,
 }

@@ -8,4 +8,16 @@ pub enum ContractError {
 
     #[error("Unauthorized")]
     Unauthorized {},
+
+    #[error("Not pledged")]
+    NotPledged,
+
+    #[error("No funds sent")]
+    NoFundsSent,
+
+    InsufficientAmount,
+
+    PledgeInProgress,
+
+    BadRequest,
 }
