@@ -1,5 +1,11 @@
 # CosmWasm Plus
 
+![CosmWasm Plus Logo](logo/logo.png)
+
+[![Rust Version](https://img.shields.io/badge/Rust-1.81.0+-blue.svg)](https://golang.org)
+[![License: Apache2.0](https://img.shields.io/badge/License-Apache2.0-green.svg)](https://opensource.org/licenses/MIT)
+
+
 **CosmWasm Plus** is a fork of the [CosmWasm/cw-plus](https://github.com/nezha90/cw-plus), created to offer optimized smart contract solutions for specific application scenarios. Our core work focuses on extending and customizing the original features to meet more complex business needs.
 
 An important contract we have developed is `cw1-deposit`. It fully leverages the performance and features of the Titan chain and uses its test token, tnt4, as the basis for a complete staking and rewards system. This contract provides users with a secure and transparent way to stake their tokens and earn rewards according to predefined rules.
