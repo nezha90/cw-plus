@@ -1,7 +1,7 @@
 use cosmwasm_std::{Uint128, StdError, Storage};
 
 use crate::types::{StakingInfo};
-use crate::consts::{INTEREST_RATE, PRECISION, YEAR, END_TIME};
+use crate::consts::{INTEREST_RATE, PRECISION, YEAR, END_TIME, CHANGE_TIME, OLD_INTEREST_RATE};
 
 pub fn update_rewards(
     storage: &mut dyn Storage,
@@ -21,15 +21,46 @@ pub fn update_rewards(
         return Ok(())
     }
 
-    // 计算从上次更新到现在的收益
-    let elapsed_time = current_time - staking_info.last_update_time;
+    let (new_reward, new_remainder) = if current_time <= CHANGE_TIME {
+        // 计算从上次更新到现在的收益
+        let elapsed_time = current_time - staking_info.last_update_time;
 
-    // 计算收益并更新余数
-    let (new_reward, new_remainder) = calculate_reward_with_remainder(
-        staking_info.principal.u128(),
-        elapsed_time as u128,
-        staking_info.remainder,
-    );
+        calculate_reward_with_remainder(
+            OLD_INTEREST_RATE,
+            staking_info.principal.u128(),
+            elapsed_time as u128,
+            staking_info.remainder,
+        )
+    } else if staking_info.last_update_time < CHANGE_TIME {
+        let elapsed_time = CHANGE_TIME - staking_info.last_update_time;
+
+        let (new_reward_temp_1, new_remainder_temp_1) = calculate_reward_with_remainder(
+            OLD_INTEREST_RATE,
+            staking_info.principal.u128(),
+            elapsed_time as u128,
+            staking_info.remainder);
+
+
+        let elapsed_time = current_time - CHANGE_TIME;
+
+        let (new_reward_temp_2, new_remainder_temp_2) = calculate_reward_with_remainder(
+            INTEREST_RATE,
+            staking_info.principal.u128(),
+            elapsed_time as u128,
+            new_remainder_temp_1);
+
+        (new_reward_temp_1 + new_reward_temp_2, new_remainder_temp_2)
+    } else {
+
+        let elapsed_time = current_time - staking_info.last_update_time;
+
+       calculate_reward_with_remainder(
+            INTEREST_RATE,
+            staking_info.principal.u128(),
+            elapsed_time as u128,
+            staking_info.remainder)
+    };
+
 
     // 更新用户的待领取收益
     staking_info.pending_reward += Uint128::from(new_reward);
@@ -41,12 +72,13 @@ pub fn update_rewards(
 
 // 计算收益
 pub fn calculate_reward_with_remainder(
+    interest_rate: u128,
     principal: u128,
     seconds: u128,
     remainder: u128, // 上一次的余数
 ) -> (u128, u128) {
     // 计算分子：(本金 * 利率 * 秒) + 余数
-    let numerator = principal * INTEREST_RATE * seconds + remainder;
+    let numerator = principal * interest_rate * seconds + remainder;
 
     // 分母：年时间单位 * 精度因子
     let denominator = YEAR as u128 * PRECISION;

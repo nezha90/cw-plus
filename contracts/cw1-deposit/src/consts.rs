@@ -4,6 +4,9 @@ use cosmwasm_std::Uint128;
 pub const START_TIME: Item<u64> = Item::new("start_time");
 pub const END_TIME: Item<u64> = Item::new("end_time");
 
+pub const OLD_INTEREST_RATE: u128 = 120;
+pub const CHANGE_TIME: u64 = 1756440000;
+
 pub const INTEREST_RATE: u128 = 30;
 pub const PRECISION: u128 = 100;
 pub const MIN_PLEDGE: Uint128 = Uint128::new(1000);
