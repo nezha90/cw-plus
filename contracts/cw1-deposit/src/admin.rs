@@ -1,6 +1,6 @@
-use cosmwasm_std::{DepsMut, Env, MessageInfo, Response, Uint128, StdError, BankMsg, Coin};
+use cosmwasm_std::{DepsMut, Env, MessageInfo, Response, Uint128, StdError, BankMsg, Coin, Addr};
 
-use crate::types::CONTRACT_STATE;
+use crate::types::{CONTRACT_STATE, STAKING_INFO};
 use crate::consts::{DENOM, END_TIME};
 use crate::ContractError;
 use crate::state::ADMIN_LIST;
@@ -91,4 +91,39 @@ pub fn extract_fund(
         })
         .add_attribute("action", "extract_fund")
         .add_attribute("amount", amount))
+}
+
+pub fn reset_un_stake(
+    deps: DepsMut,
+    env: Env,
+    info: MessageInfo,
+    user: Addr,
+)  -> Result<Response, ContractError> {
+    let admin_list = ADMIN_LIST.load(deps.storage)?;
+    if !admin_list.is_admin(info.sender.as_str()) {
+        return Err(ContractError::Unauthorized {});
+    }
+
+    let mut info = STAKING_INFO.load(deps.storage, &user)?;
+
+    if info.unstake_requests.is_empty() {
+        return Ok(Response::new()
+            .add_attribute("action", "reset_un_stake")
+            .add_attribute("user", user.to_string())
+            .add_attribute("status", "no_requests_to_update"));
+    }
+
+
+    let current_time = env.block.time.seconds();
+
+    for request in info.unstake_requests.iter_mut() {
+        request.unlock_time = current_time;
+    }
+
+    STAKING_INFO.save(deps.storage, &user, &info)?;
+
+    Ok(Response::new()
+        .add_attribute("action", "reset_un_stake")
+        .add_attribute("user", user.to_string())
+        .add_attribute("new_unlock_time", current_time.to_string()))
 }

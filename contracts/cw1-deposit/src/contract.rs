@@ -14,7 +14,7 @@ use semver::Version;
 use crate::error::ContractError;
 use crate::msg::{AdminListResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{AdminList, ADMIN_LIST};
-use crate::admin::{fund_rewards, extract_fund, update_end_time};
+use crate::admin::{fund_rewards, extract_fund, update_end_time, reset_un_stake};
 use crate::user_stake::stake;
 use crate::user_unstake::un_stake;
 use crate::user_withdraw::{withdraw_principal, claim_rewards};
@@ -72,6 +72,7 @@ pub fn execute(
         ExecuteMsg::Freeze {} => execute_freeze(deps, env, info),
         ExecuteMsg::UpdateAdmins { admins } => execute_update_admins(deps, env, info, admins),
         ExecuteMsg::FundRewards {} => fund_rewards(deps, env, info),
+        ExecuteMsg::ResetUnStake{user} => reset_un_stake(deps, env, info, user),
         ExecuteMsg::Stake {} => stake(deps, env, info),
         ExecuteMsg::UnStake {amount} => un_stake(deps, env, info, amount),
         ExecuteMsg::WithdrawPrincipal{} => withdraw_principal(deps, env, info),

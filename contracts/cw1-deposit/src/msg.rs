@@ -32,6 +32,8 @@ where
 
     FundRewards {},
 
+    ResetUnStake {user: Addr},
+
     Stake {},
 
     Update {user: Addr},
